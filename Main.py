@@ -3,6 +3,7 @@ import discord.ext.commands
 import os
 import asyncio
 import asyncpg
+import logging
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime, timezone
@@ -10,6 +11,8 @@ from time import perf_counter
 from asyncpg.pool import create_pool
 
 from apikeys import Token, Database_Name, Host_IP, Host_Port, User_Name, User_Pass
+
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 
 DEFAULT_PREFIX = "!"
 
@@ -63,9 +66,8 @@ async def setprefix(ctx: commands.Context, prefix: str):
 async def setprefix_error(ctx: commands.Context, error):
     if isinstance(error, commands.CommandInvokeError):
         await ctx.send("There was an error executing this command, please contact developer")
-        print("----!!!!----")
+        logging.error("----!!ERROR!!----")
         raise error
-        return
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send("You don't have permissions to do that :)", ephemeral=True)
         return 
@@ -74,9 +76,8 @@ async def setprefix_error(ctx: commands.Context, error):
         return 
     else:
         await ctx.send("There was an error executing this command, please contact developer")
-        print("----!!!!----")
+        logging.error("----!!ERROR!!----")
         raise error
-        return
 
 ##  Core
 
@@ -84,10 +85,9 @@ async def setprefix_error(ctx: commands.Context, error):
 @bot.event
 async def on_ready():
     synced = await bot.tree.sync()
-    print(f"synced {len(synced)} command(s)")
+    logging.info(f"synced %s command(s)", len(synced))
     await bot.change_presence(activity=discord.activity.Game(name="Church service simulator 2024"))
-    print("The Holly Roller is awake and high as a fucking kite just like always     ", "UTC:",current_time())
-    print("---------------------------------------------------------------------")
+    logging.info("The Holly Roller is awake and high as a fucking kite just like always     UTC:%s\n", current_time())
     
 #  Load cogs
 async def load():
@@ -96,15 +96,15 @@ async def load():
         if filename.endswith(".py") and not filename.startswith("_"):
             await bot.load_extension(f"cogs.{filename[:-3]}")
     end = perf_counter()
-    print(f"Loading took {(end-start)*1000} ms")
+    logging.info(f"Loading took %s ms", (end-start)*1000)
 
 async def connect():
     try:
         bot.pool = await asyncpg.create_pool(database=Database_Name, host=Host_IP, port=Host_Port, user=User_Name, password=User_Pass)
-        print("Connection to DB was successfully established.")
+        logging.info("Connection to DB was successfully established.")
         return True
     except:
-        print("Connection to DB failed to establish.")
+        logging.critical("Connection to DB failed to establish.")
         return False
 
 #  Main

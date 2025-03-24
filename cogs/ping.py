@@ -1,7 +1,9 @@
 import discord
+import logging
 from discord.ext import commands
 from datetime import datetime, timezone
 
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 #time
 def current_time ():
     now = datetime.now(timezone.utc)
@@ -16,7 +18,7 @@ class ping(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        print("---|Ping       cog loaded!|---", current_time())
+        logging.info("---|Ping       cog loaded!|---  %s", current_time())
 
     @commands.hybrid_command(name="ping", description="you ping i pong! ;)", aliases=["Ping"])
     async def ping(self, ctx: commands.Context):
@@ -35,7 +37,7 @@ class ping(commands.Cog):
     @ping.error
     async def ping_error(self, ctx: commands.Context, error):
         await ctx.send("There was an error executing this command, please contact developer")
-        print("----!!!!----")
+        logging.error("----!!ERROR!!----")
         raise error 
 
 async def setup(bot):

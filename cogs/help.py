@@ -1,8 +1,11 @@
 import discord
 import typing
+import logging
 from discord import app_commands
 from discord.ext import commands
 from datetime import datetime, timezone
+
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 
 #time
 def current_time ():
@@ -66,7 +69,7 @@ class help(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        print("---|Help       cog loaded!|---", current_time())
+        logging.info("---|Help       cog loaded!|---  %s", current_time())
 
     @app_commands.command(name="help", description="command help list")
     async def help(self, interaction: discord.Integration, category: typing.Literal["all/general","settings"] = "all/general"):
@@ -98,16 +101,14 @@ class help(commands.Cog):
     @help.error
     async def help_error(self, interaction: discord.Integration, error):
         await interaction.response.send_message("There was an error executing this command, please contact developer")
-        print("----!!!!----")
+        logging.error("----!!ERROR!!----")
         raise error
-        return
     
     @help_prefix.error
     async def help_prefix_error(self, ctx: commands.Context, error):
         await ctx.send("There was an error executing this command, please contact developer")
-        print("----!!!!----")
+        logging.error("----!!ERROR!!----")
         raise error
-        return
 
 async def setup(bot):
     await bot.add_cog(help(bot))

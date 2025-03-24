@@ -1,10 +1,12 @@
 import discord
 import typing
+import logging
 from discord import app_commands, File
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
 from datetime import datetime, timezone
 
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 #time
 def current_time():
     now = datetime.now(timezone.utc)
@@ -47,7 +49,7 @@ class settings(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        print("---|settings   cog loaded!|---", current_time())
+        logging.info("---|settings   cog loaded!|---  %s", current_time())
 
 # settings channels
     
@@ -499,7 +501,7 @@ class settings(commands.Cog):
     async def channels_error(self, interaction: discord.Interaction, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await interaction.response.send_message("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message("You don't have permissions to do that :)", ephemeral=True)    
@@ -508,7 +510,7 @@ class settings(commands.Cog):
     async def channels_prefix_error(self, ctx: commands.Context, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, app_commands.MissingPermissions):
             await ctx.send("You don't have permissions to do that :)", ephemeral=True) 
@@ -517,7 +519,7 @@ class settings(commands.Cog):
     async def messages_error(self, interaction: discord.Interaction, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await interaction.response.send_message("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message("You don't have permissions to do that :)", ephemeral=True)
@@ -529,7 +531,7 @@ class settings(commands.Cog):
     async def messages_prefix_error(self, ctx: commands.Context, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, app_commands.MissingPermissions):
             await ctx.send("You don't have permissions to do that :)", ephemeral=True)
@@ -541,14 +543,14 @@ class settings(commands.Cog):
     async def show_error(self, interaction: discord.Interaction, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await interaction.response.send_message("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
         
     @show_prefix.error
     async def show_prefix_error(self, ctx: commands.Context, error):
         if isinstance(error, app_commands.CommandInvokeError):
             await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
 
 async def setup(bot):
