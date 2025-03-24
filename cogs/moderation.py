@@ -1,11 +1,13 @@
 import discord
 import typing
+import logging
 from discord import File
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
 from datetime import datetime, timezone
 from datetime import timedelta
 
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 #time
 
 def current_time():
@@ -50,7 +52,7 @@ class moderation(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        print("---|moderation cog loaded!|---", current_time())
+        logging.info("---|moderation cog loaded!|---   %s", current_time())
     
 # kick
 
@@ -282,9 +284,8 @@ class moderation(commands.Cog):
     async def kick_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send("The bot is missing permissions.", ephemeral=True)
             return
@@ -296,17 +297,15 @@ class moderation(commands.Cog):
             return 
         else:
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
 
     @ban.error
     async def ban_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send("The bot is missing permissions.", ephemeral=True)
             return
@@ -318,17 +317,15 @@ class moderation(commands.Cog):
             return 
         else:
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
 
     @unban.error
     async def unban_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send("The bot is missing permissions.", ephemeral=True)
             return
@@ -340,17 +337,15 @@ class moderation(commands.Cog):
             return 
         else:
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         
     @mute.error
     async def mute_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send("The bot is missing permissions.", ephemeral=True)
             return
@@ -362,17 +357,15 @@ class moderation(commands.Cog):
             return 
         else:
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
     
     @unmute.error
     async def unmute_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
         elif isinstance(error, commands.BotMissingPermissions):
             await ctx.send("The bot is missing permissions.", ephemeral=True)
             return
@@ -384,9 +377,8 @@ class moderation(commands.Cog):
             return 
         else:
             await ctx.send("There was an error executing this command, please contact developer")
-            print("----!!!!----")
+            logging.error("----!!ERROR!!----")
             raise error
-            return
 
 async def setup(bot):
   await bot.add_cog(moderation(bot))

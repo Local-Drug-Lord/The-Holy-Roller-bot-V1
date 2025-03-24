@@ -1,6 +1,9 @@
 import discord
+import logging
 from discord.ext import commands
 from datetime import datetime, timezone
+
+logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 
 #time
 def current_time ():
@@ -100,7 +103,7 @@ class greetings(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        print("---|greetings  cog loaded!|---", current_time())
+        logging.info("---|greetings  cog loaded!|---  %s", current_time())
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
