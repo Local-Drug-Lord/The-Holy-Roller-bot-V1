@@ -87,7 +87,7 @@ async def on_ready():
     synced = await bot.tree.sync()
     logging.info(f"synced %s command(s)", len(synced))
     await bot.change_presence(activity=discord.activity.Game(name="Church service simulator 2024"))
-    logging.info("The Holly Roller is awake and high as a fucking kite just like always     UTC:%s\n", current_time())
+    logging.info("The Holy Roller is awake and high as a fucking kite just like always     UTC:%s\n", current_time())
     
 #  Load cogs
 async def load():
