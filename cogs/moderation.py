@@ -166,11 +166,11 @@ class moderation(commands.Cog):
                 Loggin_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
-                    await ctx.send(f'User {user.mention} has been banned.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    await ctx.send(f'User {user.mention} has been unbanned.\nPlease consider setting up the logging feature by running "/settings channels".')
 
                 else:
                     reason = " ".join(ctx.message.content.split()[2:])
-                    await ctx.send(f'User {user.mention} has been banned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    await ctx.send(f'User {user.mention} has been unbanned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
 
                 if Loggin_channel:
                     action = "unbanned"

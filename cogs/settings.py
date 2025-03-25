@@ -29,7 +29,7 @@ async def log_entry(self, author_id, guild_id, What, Type, To):
     channel = await get_logging_channel(guild_id, self)
     if channel:
         image_file = File("Images/settings_icon.png", filename="settings_icon.png")
-        log_entry_embed = discord.Embed(title="Server config action!", description="Someone has made a changed a server config setting for The Holly Roller!", color=discord.Color.from_rgb(140,27,27))
+        log_entry_embed = discord.Embed(title="Server config action!", description="Someone has made a changed a server config setting for The Holy Roller!", color=discord.Color.from_rgb(140,27,27))
         log_entry_embed.add_field(name="", value=f"**{What}** **{Type}** was changed to **{To}**")
         log_entry_embed.set_thumbnail(url="attachment://settings_icon.png") 
         if Type == "attachment":
