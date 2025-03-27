@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: A standard bug report
-title: ''
+title: 'Bug: '
 labels: Bug
 assignees: Local-Drug-Lord
 
