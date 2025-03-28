@@ -104,7 +104,7 @@ async def connect():
         logging.info("Connection to DB was successfully established.")
         return True
     except:
-        logging.critical("Connection to DB failed to establish.")
+        logging.error("Connection to DB failed to establish.")
         return False
 
 #  Main
@@ -112,6 +112,8 @@ async def main():
 
     #startup debugging, remove # to turn on
     #discord.utils.setup_logging()
+
+    logging.info("Connecting to DB...")
 
     connected = False
     while connected == False:
