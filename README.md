@@ -7,32 +7,34 @@ The Holy Roller is a (to be) general purpose discord bot made and managed by me 
 As of recently I've come to the decision to make the code open source, do I recommend using my code? No, not at all. Why? Well where do I start?
 
 1. It's really shitty code.
-2. I'm not a professional programmer and shall not be trusted.
-3. There is bugs, lots of bugs. (I'm working on some of them, if you find anything please make a thingy in the issues tab and i shall take a look at it. Don't forget to use the template :) )
+2. I'm not a professional programmer and shall not be trusted as one.
+3. There is bugs, lots of bugs. (I'm working on some of them, if you find anything please make an [issue in the issues tab](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues) and i shall take a look at it. Don't forget to use the template :) )
 4. Coding is fun, make your own bot from scratch.
 5. I don't trust myself when it comes to good code.
 
 ## Why Is The Holy Roller?
 
-I had been thinking about making a discord bot for some time. I'm strongly against how some bot makers are putting major (and non major) features behind a paywalls so I decided to make my own. "How hard can it be!" I said back then, if you ask me now I'll just pull out a gun and shoot myself. I really hate programming if I'm honest but I do also find something quite fun in it, I also love seeing the results and looking at the bot thinking about all the hours I've put into it. There's a special feeling about it all.
+I had been thinking about making a discord bot for some time. I'm strongly against how some bot makers are putting major (and non major) features behind a paywalls so I decided to make my own. "How hard can it be!" I said back then, if you ask me now I'll just pull out a gun and shoot myself. I really hate programming if I'm honest, but I do find something quite fun in it. I also love seeing the results and looking at the bot thinking about all the hours I've put into it. There's a special feeling about it all.
 
 ## How Do I Use The Bot Myself? (Myself being you the user/server owner)
 
 Well there's two ways of doing it:
 
 - Add the bot to your server using this [link](https://discord.com/oauth2/authorize?client_id=1197233793640177726).
-- Or copy paste my code. (Which is a pain in the ass that takes time to set up)
+- Or copy paste my code. (Which is a pain in the ass and takes time to set up)
 
 ### Dependencies
 
-- Python 3 or older
-- Pip (to install the rest)
+- [Python 3.13 or older](https://www.python.org/downloads/)
+- [Pip](https://pip.pypa.io/en/stable/installation/) (to install the rest)
 - Postgres database set up properly (see Database.md)
-- A discord bot account thingy
-- A apikeys.py that's all set up to specs (just fill up where it says to fill up)
+- [A discord bot account](https://discord.com/developers)
+- A apikeys.py file that is set up to specs (see apikeys-template.py)
+
 Pip packs:
-- Discord.py
-- Asyncpg (Used to connect and send/remove/view database data in Postgre)
+
+- [Discord.py](https://discordpy.readthedocs.io/en/stable/intro.html)
+- [Asyncpg](https://pypi.org/project/asyncpg/) (Used to connect and send/remove/view SLQ/database data in Postgre)
 
 ### Starting the bot
 
@@ -41,21 +43,21 @@ Do not forget to read through the whole README.md, TOS-and-EUA.md and Database.m
 
 - Errors (Critical and non critical)
 - Forgotten settings/dependencies
-- A bloody awful pain in the ass
+- A bloody awful time
 
 ## Help
 
-If you need any help or find a bug you're free to join the discord server and ask for help or make an issue post in the github repository.
+If you need any help or find a bug you're free to join the [discord server](https://discord.gg/bXxFh72JNb) and ask for help or [make a bug report](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues) the github repository.
 
 ## Authors
 
 ### Contributors
 
-Me
-Me again
-My alt accounts
-A random dude on the train who told me i could do it
-Redbull
+- Me
+- Me again
+- My alt accounts
+- A random dude on the train who told me i could do it
+- Redbull
 
 ## TOS and EUA
 
