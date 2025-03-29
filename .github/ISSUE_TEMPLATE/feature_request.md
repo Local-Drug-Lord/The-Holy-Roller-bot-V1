@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest a new / improved feature for the bot
-title: ''
+title: 'Request: '
 labels: Request / criticism
 assignees: Local-Drug-Lord
 
