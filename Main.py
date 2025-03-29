@@ -104,7 +104,7 @@ async def connect():
         logging.info("Connection to DB was successfully established.")
         return True
     except:
-        logging.error("Connection to DB failed to establish.")
+        logging.critical("Connection to DB failed to establish.")
         return False
 
 #  Main
