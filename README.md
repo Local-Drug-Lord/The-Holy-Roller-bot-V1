@@ -59,6 +59,21 @@ If you need any help or find a bug you're free to join the [discord server](http
 - A random dude on the train who told me i could do it
 - Redbull
 
+## Versioning standard
+
+Ever wondered what V4.5.15 actually means?
+Well you're not alone, most companies use a system called "Semantic versioning" (SemVer).
+Here's a helpful table:
+
+| Major | Minor | Patch |
+|:-----:|:-----:|:-----:|
+|4      |5      |15     |
+
+In this example this program would be in it's 4th major release, 5th minor release and 15th path release.
+Major releases would be something like a big new feature set.
+Minor releases would be something like small changes/updates, often as a response to criticism.
+Path release would be fixes to bugs, vulnerability or just something that needs a small touch of paint to be better.
+
 ## TOS and EUA
 
 Read TOS-and-EUA.md
