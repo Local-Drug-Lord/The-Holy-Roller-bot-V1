@@ -58,6 +58,7 @@ class moderation(commands.Cog):
 
     @commands.hybrid_command(name = "kick", description='Kicks a member', aliases=["Kick"])
     @commands.has_permissions(kick_members = True)
+    @commands.guild_only()
     async def kick(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
 
         try:
@@ -100,6 +101,7 @@ class moderation(commands.Cog):
 
     @commands.hybrid_command(name = "ban", description='Bans a member', aliases=["Ban"])
     @commands.has_permissions(ban_members = True)
+    @commands.guild_only()
     async def ban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
 
         try:
@@ -143,6 +145,7 @@ class moderation(commands.Cog):
 
     @commands.hybrid_command(name = "unban", description='unbans a member', aliases = ["Unban","uban","Uban"])
     @commands.has_permissions(ban_members = True)
+    @commands.guild_only()
     async def unban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
 
         try:
@@ -183,6 +186,7 @@ class moderation(commands.Cog):
 
     @commands.hybrid_command(name = "mute", description='Mutes a member', aliases = ["Mute"])
     @commands.has_permissions(moderate_members = True)
+    @commands.guild_only()
     async def mute(self, ctx: commands.Context, user: discord.Member|discord.User, time: str, reason: typing.Optional[str] = None):
 
         try:
@@ -251,6 +255,7 @@ class moderation(commands.Cog):
 
     @commands.hybrid_command(name = "unmute", description='Unmutes a member', aliases = ["Unmute", "Umute", "umute"])
     @commands.has_permissions(moderate_members = True)
+    @commands.guild_only()
     async def unmute(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
                 
         try:

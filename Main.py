@@ -54,6 +54,7 @@ async def on_guild_remove(guild):
 #   Change prefix 
 @bot.hybrid_command(name = "prefix", description='Change prefix used for the bot in this server', aliases=["Prefix"])
 @commands.has_permissions(manage_guild = True)
+@commands.guild_only()
 async def setprefix(ctx: commands.Context, prefix: str):
     try:
         await bot.pool.execute('UPDATE info SET prefix = $2 WHERE guild_id = $1', ctx.guild.id, prefix)
