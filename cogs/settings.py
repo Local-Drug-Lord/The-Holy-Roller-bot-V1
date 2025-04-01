@@ -44,7 +44,7 @@ class settings(commands.Cog):
         self.bot = bot
         self.pool = bot.pool
 
-    group = app_commands.Group(name="settings", description="configure settings")
+    group = app_commands.Group(name="settings", description="configure settings", guild_only=True)
     
     @commands.Cog.listener()
     async def on_ready(self):
