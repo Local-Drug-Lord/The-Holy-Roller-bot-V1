@@ -368,14 +368,16 @@ class settings(commands.Cog):
         wlc_pic_record = await self.pool.fetchrow('SELECT wlc_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             wlc_pic = wlc_pic_record["wlc_pic"]
-            setup_pics += 1
+            if wlc_pic != None:
+                setup_pics += 1
         except:
             wlc_pic = False
         #Goodbye attachment
         bye_pic_record = await self.pool.fetchrow('SELECT bye_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             bye_pic = bye_pic_record["bye_pic"]
-            setup_pics += 1
+            if bye_pic != None:
+                setup_pics += 1
         except:
             bye_pic = False
         #Embed
@@ -385,12 +387,10 @@ class settings(commands.Cog):
                 show_embed.add_field(name="Logging channel:", value="**Not set**", inline=False)
             else:
                 show_embed.add_field(name="Logging channel:", value=log_channel.mention, inline=False)
-
             if wlc_channel == False:
                 show_embed.add_field(name="Welcome channel:", value="**Not set**", inline=False)
             else:
                 show_embed.add_field(name="Welcome channel:", value=wlc_channel.mention, inline=False)
-
             if bye_channel == False:
                 show_embed.add_field(name="Goodbye channel:", value="**Not set**", inline=False)
             else:
@@ -450,14 +450,16 @@ class settings(commands.Cog):
         wlc_pic_record = await self.pool.fetchrow('SELECT wlc_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             wlc_pic = wlc_pic_record["wlc_pic"]
-            setup_pics += 1
+            if wlc_pic != None:
+                setup_pics += 1
         except:
             wlc_pic = False
         #Goodbye attachment
         bye_pic_record = await self.pool.fetchrow('SELECT bye_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             bye_pic = bye_pic_record["bye_pic"]
-            setup_pics += 1
+            if bye_pic != None:
+                setup_pics += 1
         except:
             bye_pic = False
         #Embed
