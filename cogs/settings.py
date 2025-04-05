@@ -368,7 +368,7 @@ class settings(commands.Cog):
         wlc_pic_record = await self.pool.fetchrow('SELECT wlc_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             wlc_pic = wlc_pic_record["wlc_pic"]
-            if wlc_pic != None:
+            if wlc_pic != None and wlc_pic.lower() != "none":
                 setup_pics += 1
         except:
             wlc_pic = False
@@ -376,7 +376,7 @@ class settings(commands.Cog):
         bye_pic_record = await self.pool.fetchrow('SELECT bye_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             bye_pic = bye_pic_record["bye_pic"]
-            if bye_pic != None:
+            if bye_pic != None and bye_pic.lower() != "none":
                 setup_pics += 1
         except:
             bye_pic = False
@@ -450,7 +450,7 @@ class settings(commands.Cog):
         wlc_pic_record = await self.pool.fetchrow('SELECT wlc_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             wlc_pic = wlc_pic_record["wlc_pic"]
-            if wlc_pic != None:
+            if wlc_pic != None and wlc_pic.lower() != "none":
                 setup_pics += 1
         except:
             wlc_pic = False
@@ -458,7 +458,7 @@ class settings(commands.Cog):
         bye_pic_record = await self.pool.fetchrow('SELECT bye_pic FROM info WHERE guild_id = $1', guild_id)
         try:
             bye_pic = bye_pic_record["bye_pic"]
-            if bye_pic != None:
+            if bye_pic != None and bye_pic.lower() != "none":
                 setup_pics += 1
         except:
             bye_pic = False
@@ -487,7 +487,6 @@ class settings(commands.Cog):
                 show_embed.add_field(name="Welcome attachment:", value="**Not set**", inline=False)
             else:
                 show_embed.add_field(name="Welcome attachment:", value=wlc_pic, inline=False)
-
             if bye_pic == False:
                 show_embed.add_field(name="Goodbye attachment:", value="**Not set**", inline=False)
             else:
