@@ -10,7 +10,7 @@ def current_time ():
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     return current_time
 
-class ping(commands.Cog):
+class issue(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
         self.pool = bot.pool
@@ -35,4 +35,4 @@ class ping(commands.Cog):
         raise error 
 
 async def setup(bot):
-  await bot.add_cog(ping(bot))
+  await bot.add_cog(issue(bot))
