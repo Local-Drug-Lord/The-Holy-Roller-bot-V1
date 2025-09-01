@@ -13,7 +13,7 @@ def current_time ():
 class ping(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
-        self.pool =bot.pool
+        self.pool = bot.pool
     
     @commands.Cog.listener()
     async def on_ready(self):
