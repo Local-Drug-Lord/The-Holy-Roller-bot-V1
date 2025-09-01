@@ -10,7 +10,7 @@ def current_time ():
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     return current_time
 
-class ping(commands.Cog):
+class request(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
         self.pool = bot.pool
@@ -18,7 +18,7 @@ class ping(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
-        logging.info("---|request    cog loaded!|---  %s", current_time())
+        logging.info("---|Request    cog loaded!|---  %s", current_time())
 
     @commands.hybrid_command(name="request", description="Request a feature", aliases=["Request"])
     async def ping(self, ctx: commands.Context):
@@ -35,4 +35,4 @@ class ping(commands.Cog):
         raise error 
 
 async def setup(bot):
-  await bot.add_cog(ping(bot))
+  await bot.add_cog(request(bot))
