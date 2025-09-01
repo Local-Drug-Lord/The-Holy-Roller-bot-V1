@@ -47,7 +47,7 @@ async def log_entry(self, ctx, user, action, author_id, reason, time, channel):
 class moderation(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
-        self.pool =bot.pool
+        self.pool = bot.pool
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -155,7 +155,6 @@ class moderation(commands.Cog):
             user = await self.bot.fetch_user(int(user_id))
 
         author_id = ctx.author.id
-        server = ctx.guild.name
 
         if user_id == author_id:
             await ctx.send("Ok, let's think this over...\nYou're in the server you want to be unbanned from... right?\n-# (Buddy ain't the smartest :cold_face:)")
@@ -263,7 +262,6 @@ class moderation(commands.Cog):
         except:
             user_id = int(user)
             user = await self.bot.fetch_user(int(user_id))
-        server = ctx.guild.name
         author_id = ctx.author.id
 
         if user_id == author_id:

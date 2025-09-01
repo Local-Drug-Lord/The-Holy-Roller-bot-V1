@@ -47,7 +47,7 @@ Do not forget to read through the whole README.md, TOS-and-EUA.md and Database.m
 
 ## Help
 
-If you need any help or find a bug you're free to join the [discord server](https://discord.gg/bXxFh72JNb) and ask for help or [make a bug report](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues) the github repository.
+If you need any help or find a bug you're free to join the [discord server](https://discord.gg/bXxFh72JNb) and ask for help or [make a bug report](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues) via the github repository.
 
 ## Authors
 
