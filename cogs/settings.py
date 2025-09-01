@@ -86,13 +86,13 @@ class settings(commands.Cog):
         channel_type = channel_temp
         guild_id = ctx.guild.id
 
-        if channel_type in {"log", "logs", "logging", "logging/logs"}:
+        if channel_type.lower() in {"log", "logs", "logging", "logging/logs"}:
             channel_type = "Logging/Logs"
 
-        elif channel_type in {"welcome", "wlc", "wel"}:
+        elif channel_type.lower() in {"welcome", "wlc", "wel"}:
             channel_type = "Welcome"
 
-        elif channel_type in {"goodbye", "bye", "gbye"}:
+        elif channel_type.lower() in {"goodbye", "bye", "gbye"}:
             channel_type = "Goodbye"
 
         else:
@@ -164,7 +164,7 @@ class settings(commands.Cog):
                         return
                 elif '#' in user_input:
                     hex = user_input
-                    await self.pool.execute('INSERT INTO info (guild_id, bye_rgb) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET bye_rgb = $2', guild_id, str(user_input))
+                    await self.pool.execute('INSERT INTO info (guild_id, wlc_rgb) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET wlc_rgb = $2', guild_id, str(user_input))
                     await interaction.response.send_message(f"**Welcome embed color** was changed to {hex}")
                 else:
                     await interaction.response.send_message(f"`{user_input}` is not a valid rgb or hex code, please use rgb or hex")
@@ -207,15 +207,15 @@ class settings(commands.Cog):
                         g = int(g)
                         b = int(b)
                         hex = discord.Color.from_rgb(r, g, b)
-                        await self.pool.execute('INSERT INTO info (guild_id, wlc_rgb) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET wlc_rgb = $2', guild_id, str(hex))
-                        await interaction.response.send_message(f"**Welcome embed color** was changed to {hex}")
+                        await self.pool.execute('INSERT INTO info (guild_id, bye_rgb) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET bye_rgb = $2', guild_id, str(hex))
+                        await interaction.response.send_message(f"**Goodbye embed color** was changed to {hex}")
                     except:
                         await interaction.response.send_message(f"`{user_input}` is not a valid rgb or hex code, please use rgb or hex")
                         return
                 elif '#' in user_input:
                     hex = user_input
                     await self.pool.execute('INSERT INTO info (guild_id, bye_rgb) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET bye_rgb = $2', guild_id, str(user_input))
-                    await interaction.response.send_message(f"**Welcome embed color** was changed to {hex}")
+                    await interaction.response.send_message(f"**Goodbye embed color** was changed to {hex}")
                 else:
                     await interaction.response.send_message(f"`{user_input}` is not a valid rgb or hex code, please use rgb or hex")
                     return
