@@ -23,7 +23,7 @@ class issue(commands.Cog):
     @commands.hybrid_command(name="issue", description="report a bug", aliases=["Issue"])
     async def ping(self, ctx: commands.Context):
         Issue_embed = discord.Embed(title="Report and issue :broken_chain:", color=discord.Color.from_rgb(41,134,0))
-        Issue_embed.add_field(name="Github issues:", value= "[https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choose](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choos)", inline=False)
+        Issue_embed.add_field(name="Github issues:", value= "https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choose", inline=False)
 
         Issue_embed.set_footer(text=f"UTC: {current_time()}")
         await ctx.send(embed=Issue_embed)
