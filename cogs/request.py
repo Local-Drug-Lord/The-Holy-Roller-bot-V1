@@ -23,7 +23,7 @@ class request(commands.Cog):
     @commands.hybrid_command(name="request", description="Request a feature", aliases=["Request"])
     async def ping(self, ctx: commands.Context):
         Issue_embed = discord.Embed(title="Request a feature :tools:", color=discord.Color.from_rgb(41,134,0))
-        Issue_embed.add_field(name="Github request:", value= "https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choose[https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choose]", inline=False)
+        Issue_embed.add_field(name="Github request:", value= "[https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choose](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues/new/choos)", inline=False)
 
         Issue_embed.set_footer(text=f"UTC: {current_time()}")
         await ctx.send(embed=Issue_embed)
