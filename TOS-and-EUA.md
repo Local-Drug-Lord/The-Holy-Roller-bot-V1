@@ -28,7 +28,7 @@
 
 ## By using or adding this bot/application/code/repository to your server(s) you acknowledge that
 
-- I don't own the right to any of the gifs or images in the Images folder. LDL_pfp.png (my pfp) and Holy_Roller_pfp.png (bot pfp) are both AI generated using [playground-v2.5](https://huggingface.co/spaces/playgroundai/playground-v2.5) using the prompts "Jesus christ smoking weed" and "God smoking weed" and are therefore not restricted under any copyright or copyleft laws, the rest of the images are taken from other sources like [emoji.gg](https://emoji.gg) and [tenor.com](https://tenor.com)
+- I don't own the right to any of the GIFs images in the Images folder. LDL_pfp.png (my pfp) and Holy_Roller_pfp.png (bot pfp) are both AI generated using [playground-v2.5](https://huggingface.co/spaces/playgroundai/playground-v2.5) using the prompts "Jesus christ smoking weed" and "God smoking weed" and are therefore not restricted under any copyright or copyleft laws, the rest of the images are taken from other sources like [emoji.gg](https://emoji.gg) and [tenor.com](https://tenor.com)
 - I'm the only current developer and manager of this bot/application/code/repository.
 - Updates may take anywhere from weeks to months to years due to fact stated above.
 - That the bot/application/code/repository service won't be 100% stable and will at times go down due to factors outside of my control.

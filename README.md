@@ -34,7 +34,7 @@ Well there's two ways of doing it:
 Pip packs:
 
 - [Discord.py](https://discordpy.readthedocs.io/en/stable/intro.html)
-- [Asyncpg](https://pypi.org/project/asyncpg/) (Used to connect and send/remove/view SLQ/database data in Postgre)
+- [Asyncpg](https://pypi.org/project/asyncpg/) (Used to connect and send/remove/view SLQ/database data in Postgres)
 
 ### Starting the bot
 

@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-Go to the ["Security" (sheild symbol)](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/security) tab on the [repository](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1) and click "Report a vulnerability".
+Go to the ["Security" (shield symbol)](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/security) tab on the [repository](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1) and click "Report a vulnerability".
 Thereafter make a bug report in the [issues tab](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/issues) or DM me on discord. (see [Contact-Details.md](https://github.com/Local-Drug-Lord/The-Holy-Roller-bot-V1/blob/main/Contact-Details.md))
 
 ## Supported Versions
