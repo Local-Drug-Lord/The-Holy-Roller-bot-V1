@@ -29,8 +29,8 @@ async def get_welcome(guild_id, welcome, Type, member, guild_name):
             welcome_title = False
         return welcome_title
     elif Type == "hex":
-        welcome_hex = await welcome.pool.fetchrow('SELECT wlc_rgb FROM info WHERE guild_id = $1', guild_id)
-        wlc_hex = welcome_hex["wlc_rgb"]
+        welcome_hex = await welcome.pool.fetchrow('SELECT wlc_hex FROM info WHERE guild_id = $1', guild_id)
+        wlc_hex = welcome_hex["wlc_hex"]
         if wlc_hex is None:
             welcome_hex = discord.Color.from_rgb(1, 134, 0)
         else:
@@ -70,8 +70,8 @@ async def get_goodbye(guild_id, goodbye, Type, member, guild_name):
             goodbye_title = False
         return goodbye_title
     elif Type == "hex":
-        goodbye_hex = await goodbye.pool.fetchrow('SELECT bye_rgb FROM info WHERE guild_id = $1', guild_id)
-        bye_hex = goodbye_hex["bye_rgb"]
+        goodbye_hex = await goodbye.pool.fetchrow('SELECT bye_hex FROM info WHERE guild_id = $1', guild_id)
+        bye_hex = goodbye_hex["bye_hex"]
         if bye_hex is None:
             goodbye_hex = discord.Color.from_rgb(1, 134, 0)
             return goodbye_hex
