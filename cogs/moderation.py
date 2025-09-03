@@ -79,21 +79,27 @@ class moderation(commands.Cog):
                 await ctx.send("Trying to give yourself the boot? I mean you do you and all but like no, just no...", ephemeral=True)
             else:
 
-                Loggin_channel = await get_logging_channel(self, ctx)
+                Logging_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
                     await user.send(f"You've been kicked from **{server}**", file=discord.File("Images/kick.gif"))
-                    await ctx.send(f'User {user.mention} has been kicked.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been kicked.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been kicked.')
 
                 else:
                     reason = " ".join(ctx.message.content.split()[2:])
                     await user.send(f"You've been kicked from **{server}** for **{reason}**", file=discord.File("Images/kick.gif"))
-                    await ctx.send(f'User {user.mention} has been kicked for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been kicked for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been kicked for **{reason}**.')
 
-                if Loggin_channel:
+                if Logging_channel:
                     action = "kicked"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Loggin_channel)
+                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
                 
                 await user.kick(reason=reason)
 
@@ -120,21 +126,27 @@ class moderation(commands.Cog):
                 await ctx.send("Banning yourself? Nice one but sadly I'll have to say\n# NO!", ephemeral=True)
             else:
 
-                Loggin_channel = await get_logging_channel(self, ctx)
+                Logging_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
                     await user.send(f"You've been banned from **{server}**", file=discord.File("Images/ban.gif"))
-                    await ctx.send(f'User {user.mention} has been banned.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been banned.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been banned.')
 
                 else:
                     reason = " ".join(ctx.message.content.split()[2:])
                     await user.send(f"You've been banned from **{server}** for **{reason}**", file=discord.File("Images/ban.gif"))
-                    await ctx.send(f'User {user.mention} has been banned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been banned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been banned for **{reason}**.')
 
-                if Loggin_channel:
+                if Logging_channel:
                     action = "banned"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Loggin_channel)
+                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
                     
                 await user.ban(reason=reason)
 
@@ -165,19 +177,25 @@ class moderation(commands.Cog):
                 await ctx.send("That user is not banned in this server")
             else:
 
-                Loggin_channel = await get_logging_channel(self, ctx)
+                Logging_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
-                    await ctx.send(f'User {user.mention} has been unbanned.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been unbanned.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been unbanned.')
 
                 else:
                     reason = " ".join(ctx.message.content.split()[2:])
-                    await ctx.send(f'User {user.mention} has been unbanned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    if Logging_channel == False:
+                        await ctx.send(f'User {user.mention} has been unbanned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
+                    else:
+                        await ctx.send(f'User {user.mention} has been unbanned for **{reason}**.')
 
-                if Loggin_channel:
+                if Logging_channel:
                     action = "unbanned"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Loggin_channel)
+                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
                     
                 await ctx.guild.unban(discord.Object(int(user_id)))
 
@@ -230,7 +248,7 @@ class moderation(commands.Cog):
         if user_id == author_id:
             await ctx.send("Bro really just said stfu to themselves :skull:")
         else:
-            Loggin_channel = await get_logging_channel(self, ctx)
+            Logging_channel = await get_logging_channel(self, ctx)
 
             if reason == None:
                 try:
@@ -243,10 +261,10 @@ class moderation(commands.Cog):
                 await user.send(f"You've been muted from **{server}** for **{reason}**", file=discord.File("Images/mute.gif"))
                 await ctx.send(f'User {user.mention} has been muted for **{reason}**.')
 
-            if Loggin_channel:
+            if Logging_channel:
                 action = "muted"
                 time = tdelta
-                await log_entry(self, ctx, user, action, author_id, reason, time, Loggin_channel)
+                await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
 
             await user.timeout(tdelta)
 
@@ -267,7 +285,7 @@ class moderation(commands.Cog):
         if user_id == author_id:
             await ctx.send("You can't actually do that, mostly because you can't use commands when muted but also because I won't let you\n-# (and you're an idiot)")
         else:
-            Loggin_channel = await get_logging_channel(self, ctx)
+            Logging_channel = await get_logging_channel(self, ctx)
 
             if reason == None:
                 await ctx.send(f'User {user.mention} has been unmuted.')
@@ -275,10 +293,10 @@ class moderation(commands.Cog):
                 reason = " ".join(ctx.message.content.split()[2:])
                 await ctx.send(f'User {user.mention} has been unmuted for **{reason}**.')
 
-            if Loggin_channel:
+            if Logging_channel:
                 action = "unmuted"
                 time = None
-                await log_entry(self, ctx, user, action, author_id, reason, time, Loggin_channel)
+                await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
             await user.edit(timed_out_until=None)
 
 # Errors 
