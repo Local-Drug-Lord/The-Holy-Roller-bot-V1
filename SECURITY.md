@@ -12,7 +12,8 @@ Thereafter make a bug report in the [issues tab](https://github.com/Local-Drug-L
 | >V1     | :x:                |
 | V1      | :x:                |
 | V1.1    | :x:                |
-| V1.2.x  | :white_check_mark: |
+| V1.2.x  | :x:                |
+| V1.3.x  | :white_check_mark: |
 
 ## Timeline
 
