@@ -498,6 +498,151 @@ class settings(commands.Cog):
         await ctx.send(embed=show_embed)
         return
 
+#TODO Test
+
+    #Delete
+    @group.command(name="delete", description="Delete/reset a specific setting or all settings")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def delete(self, interaction: discord.Interaction, setting: typing.Literal["Logging/Logs", "Welcome", "Goodbye", "Prefix", "All"]):
+        guild_id = interaction.guild.id
+        author_id = interaction.user.id
+        await log_entry(self, author_id, guild_id, "Delete", "setting", setting)
+        if setting == "Logging/Logs":
+            await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
+            await interaction.response.send_message("Logging channel setting has been reset.")
+        elif setting == "Welcome":
+            await self.pool.execute('UPDATE info SET wlc_id = NULL, wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+            await interaction.response.send_message("Welcome settings have been reset.")
+        elif setting == "Goodbye":
+            await self.pool.execute('UPDATE info SET bye_id = NULL, bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+            await interaction.response.send_message("Goodbye settings have been reset.")
+        elif setting == "Prefix":
+            await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
+            await interaction.response.send_message('Prefix setting has been reset to !.')
+        elif setting == "All":
+            await self.pool.execute('DELETE FROM info WHERE guild_id = $1', guild_id)
+            await interaction.response.send_message("All settings have been deleted for this server.")
+        else:
+            await interaction.response.send_message("Invalid setting.", ephemeral=True)
+        return
+
+    #Prefix
+    @commands.command(name="delete", aliases=["reset"])
+    @app_commands.checks.has_permissions(administrator=True)
+    async def delete_prefix(self, ctx: commands.Context, setting: str):
+        guild_id = ctx.guild.id
+        author_id = ctx.author.id
+        setting = setting.lower()
+        await log_entry(self, author_id, guild_id, "Delete", "setting", setting)
+        if setting in {"logging", "logs", "log"}:
+            await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
+            await ctx.send("Logging channel setting has been reset.")
+        elif setting in {"welcome", "wlc"}:
+            await self.pool.execute('UPDATE info SET wlc_id = NULL, wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+            await ctx.send("Welcome settings have been reset.")
+        elif setting in {"goodbye", "bye"}:
+            await self.pool.execute('UPDATE info SET bye_id = NULL, bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+            await ctx.send("Goodbye settings have been reset.")
+        elif setting in {"prefix"}:
+            await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
+            await ctx.send('Prefix setting has been reset to !.')
+        elif setting == "all":
+            await self.pool.execute('DELETE FROM info WHERE guild_id = $1', guild_id)
+            await ctx.send("All settings have been deleted for this server.")
+        else:
+            await ctx.send("Invalid setting. Use logging, welcome, goodbye, prefix, or all.")
+        return
+
+#TODO Test
+    #Delete_message
+    @group.command(name="delete_message", description="Delete/reset message settings (content, color, etc.)")
+    @app_commands.checks.has_permissions(administrator=True)
+    async def delete_message(self, interaction: discord.Interaction, message_type: typing.Literal["Welcome", "Goodbye"], setting: typing.Literal["Attachment", "Title", "Message", "Color", "All"]):
+        guild_id = interaction.guild.id
+        author_id = interaction.user.id
+        await log_entry(self, author_id, guild_id, "Delete", "message_setting", f"{message_type} {setting}")
+        if message_type == "Welcome":
+            if setting == "Attachment":
+                await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Welcome image has been reset.")
+            elif setting == "Title":
+                await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Welcome title has been reset.")
+            elif setting == "Message":
+                await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Welcome message has been reset.")
+            elif setting == "Color":
+                await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Welcome color has been reset.")
+            elif setting == "All":
+                await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("All welcome message settings have been reset.")
+        elif message_type == "Goodbye":
+            if setting == "Attachment":
+                await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Goodbye image has been reset.")
+            elif setting == "Title":
+                await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Goodbye title has been reset.")
+            elif setting == "Message":
+                await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Goodbye message has been reset.")
+            elif setting == "Color":
+                await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("Goodbye color has been reset.")
+            elif setting == "All":
+                await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                await interaction.response.send_message("All goodbye message settings have been reset.")
+        else:
+            await interaction.response.send_message("Invalid choice.", ephemeral=True)
+        return
+    
+    #Prefix
+    @commands.command(name="delete_message", aliases=["reset_message"])
+    @app_commands.checks.has_permissions(administrator=True)
+    async def delete_message_prefix(self, ctx: commands.Context, message_type: str, setting: str):
+        guild_id = ctx.guild.id
+        author_id = ctx.author.id
+        message_type = message_type.lower()
+        setting = setting.lower()
+        await log_entry(self, author_id, guild_id, "Delete", "message_setting", f"{message_type} {setting}")
+        if message_type in {"welcome", "wlc"}:
+            if setting == "attachment":
+                await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Welcome image has been reset.")
+            elif setting == "title":
+                await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Welcome title has been reset.")
+            elif setting == "message":
+                await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Welcome message has been reset.")
+            elif setting == "color":
+                await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Welcome color has been reset.")
+            elif setting == "all":
+                await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("All welcome message settings have been reset.")
+        elif message_type in {"goodbye", "bye"}:
+            if setting == "attachment":
+                await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Goodbye image has been reset.")
+            elif setting == "title":
+                await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Goodbye title has been reset.")
+            elif setting == "message":
+                await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Goodbye message has been reset.")
+            elif setting == "color":
+                await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("Goodbye color has been reset.")
+            elif setting == "all":
+                await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                await ctx.send("All goodbye message settings have been reset.")
+        else:
+            await ctx.send("Invalid choice. Use welcome/goodbye and attachment/title/message/color/all.")
+        return
+
+#TODO Add error handling for delete commands
     @channels.error
     async def channels_error(self, interaction: discord.Interaction, error):
         if isinstance(error, app_commands.CommandInvokeError):
@@ -553,6 +698,56 @@ class settings(commands.Cog):
             await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
+
+###
+
+    @delete.error
+    async def delete_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, app_commands.CommandInvokeError):
+            await interaction.response.send_message("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+            logging.error("----!!ERROR!!----")
+            raise error
+        elif isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message("You don't have permissions to do that :)", ephemeral=True)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await interaction.response.send_message("You're missing one or more required arguments", ephemeral=True)
+            return  
+        
+    @delete_prefix.error
+    async def delete_prefix_error(self, ctx: commands.Context, error):
+        if isinstance(error, app_commands.CommandInvokeError):
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+            logging.error("----!!ERROR!!----")
+            raise error
+        elif isinstance(error, app_commands.MissingPermissions):
+            await ctx.send("You don't have permissions to do that :)", ephemeral=True)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You're missing one or more required arguments", ephemeral=True)
+            return  
+        
+    @delete_message.error
+    async def delete_message_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, app_commands.CommandInvokeError):
+            await interaction.response.send_message("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+            logging.error("----!!ERROR!!----")
+            raise error
+        elif isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message("You don't have permissions to do that :)", ephemeral=True)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await interaction.response.send_message("You're missing one or more required arguments", ephemeral=True)
+            return  
+        
+    @delete_message_prefix.error
+    async def delete_message_prefix_error(self, ctx: commands.Context, error):
+        if isinstance(error, app_commands.CommandInvokeError):
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+            logging.error("----!!ERROR!!----")
+            raise error
+        elif isinstance(error, app_commands.MissingPermissions):
+            await ctx.send("You don't have permissions to do that :)", ephemeral=True)
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You're missing one or more required arguments", ephemeral=True)
+            return  
 
 async def setup(bot):
   await bot.add_cog(settings(bot))
