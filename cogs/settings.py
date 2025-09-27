@@ -498,8 +498,6 @@ class settings(commands.Cog):
         await ctx.send(embed=show_embed)
         return
 
-#TODO Test
-
     #Delete
     @group.command(name="delete", description="Delete/reset a specific setting or all settings")
     @app_commands.checks.has_permissions(administrator=True)
@@ -553,7 +551,6 @@ class settings(commands.Cog):
             await ctx.send("Invalid setting. Use logging, welcome, goodbye, prefix, or all.")
         return
 
-#TODO Test
     #Delete_message
     @group.command(name="delete_message", description="Delete/reset message settings (content, color, etc.)")
     @app_commands.checks.has_permissions(administrator=True)
@@ -642,7 +639,6 @@ class settings(commands.Cog):
             await ctx.send("Invalid choice. Use welcome/goodbye and attachment/title/message/color/all.")
         return
 
-#TODO Add error handling for delete commands
     @channels.error
     async def channels_error(self, interaction: discord.Interaction, error):
         if isinstance(error, app_commands.CommandInvokeError):
@@ -698,8 +694,6 @@ class settings(commands.Cog):
             await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
-
-###
 
     @delete.error
     async def delete_error(self, interaction: discord.Interaction, error):
