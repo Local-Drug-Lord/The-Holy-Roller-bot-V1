@@ -89,7 +89,8 @@ class moderation(commands.Cog):
                         await ctx.send(f'User {user.mention} has been kicked.')
 
                 else:
-                    reason = " ".join(ctx.message.content.split()[2:])
+                    if ctx.interaction == None:
+                        reason = " ".join(ctx.message.content.split()[2:])
                     await user.send(f"You've been kicked from **{server}** for **{reason}**", file=discord.File("Images/kick.gif"))
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been kicked for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
@@ -136,7 +137,8 @@ class moderation(commands.Cog):
                         await ctx.send(f'User {user.mention} has been banned.')
 
                 else:
-                    reason = " ".join(ctx.message.content.split()[2:])
+                    if ctx.interaction == None:
+                        reason = " ".join(ctx.message.content.split()[2:])
                     await user.send(f"You've been banned from **{server}** for **{reason}**", file=discord.File("Images/ban.gif"))
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been banned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
@@ -186,7 +188,8 @@ class moderation(commands.Cog):
                         await ctx.send(f'User {user.mention} has been unbanned.')
 
                 else:
-                    reason = " ".join(ctx.message.content.split()[2:])
+                    if ctx.interaction == None:
+                        reason = " ".join(ctx.message.content.split()[2:])
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been unbanned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
                     else:
@@ -257,7 +260,8 @@ class moderation(commands.Cog):
                 except:
                     await ctx.send(f'User {user.mention} has been muted.\n-# (Failed to send DM to user)')
             else:
-                reason = " ".join(ctx.message.content.split()[2:])
+                if ctx.interaction == None:
+                    reason = " ".join(ctx.message.content.split()[2:])
                 await user.send(f"You've been muted from **{server}** for **{reason}**", file=discord.File("Images/mute.gif"))
                 await ctx.send(f'User {user.mention} has been muted for **{reason}**.')
 
@@ -290,7 +294,8 @@ class moderation(commands.Cog):
             if reason == None:
                 await ctx.send(f'User {user.mention} has been unmuted.')
             else:
-                reason = " ".join(ctx.message.content.split()[2:])
+                if ctx.interaction == None:
+                    reason = " ".join(ctx.message.content.split()[2:])
                 await ctx.send(f'User {user.mention} has been unmuted for **{reason}**.')
 
             if Logging_channel:
