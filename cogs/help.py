@@ -38,14 +38,18 @@ def settings_help_embed(self):
     embed.set_author(name="Local Drug Lord", icon_url='attachment://LDL_pfp.png')
     embed.set_thumbnail(url='attachment://Holy_Roller_pfp.png')
 
-    embed.add_field(name="**---| channel    |---**", value= "", inline=False)
-    embed.add_field(name="*/Settings channel*", value="This command is used to change what channels does what. \nCurrent options are:", inline=True)
+    embed.add_field(name="**---| Channel    |---**", value= "", inline=False)
     embed.add_field(name="*/Settings show*", value="Show the servers current channel config", inline=True)
+    embed.add_field(name="*/Settings channel*", value="This command is used to change what channels does what. \nCurrent options are:", inline=True)
     embed.add_field(name="*Logging/Logs*", value= "This is what channel to use for keeping logs.", inline=True)
     embed.add_field(name="*Welcome*", value= "This is what channel to use for the welcome message.", inline=True)
     embed.add_field(name="*Goodbye*", value= "This is what channel to use for the goodbye message.", inline=True)
 
-    embed.add_field(name="**---| messages   |---**", value= "", inline=False)
+    embed.add_field(name="**---| Delete    |---**", value= "", inline=False)
+    embed.add_field(name="*/Settings delete*", value="This command is used to delete settings like channels or prefix, you can also fully reset everything channel related back to default", inline=True)
+    embed.add_field(name="*/Settings delete_message*", value="This command does the same as /Settings delete but for messages, this also has a reset feature but for messages", inline=True)
+
+    embed.add_field(name="**---| Messages   |---**", value= "", inline=False)
     embed.add_field(name="*/Settings messages*", value="Configure the welcome and goodbye embed messages. \nCurrent settings are:", inline=True)
     embed.add_field(name="*Attachment*", value= "This is the image you want to send in the message.\n(This should be in the form of a url/media link)", inline=True)
     embed.add_field(name="*Title*", value= "This is the title for your embed message.", inline=True)
