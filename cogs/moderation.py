@@ -76,7 +76,7 @@ class moderation(commands.Cog):
         else:
 
             if user_id == author_id:
-                await ctx.send("Trying to give yourself the boot? I mean you do you and all but like no, just no...", ephemeral=True)
+                await ctx.send("Trying to give yourself the boot? I mean you do you and all but like no, just no...")
             else:
 
                 Logging_channel = await get_logging_channel(self, ctx)
@@ -124,7 +124,7 @@ class moderation(commands.Cog):
         except discord.NotFound:
 
             if user_id == author_id:
-                await ctx.send("Banning yourself? Nice one but sadly I'll have to say\n# NO!", ephemeral=True)
+                await ctx.send("Banning yourself? Nice one but sadly I'll have to say\n# NO!")
             else:
 
                 Logging_channel = await get_logging_channel(self, ctx)
