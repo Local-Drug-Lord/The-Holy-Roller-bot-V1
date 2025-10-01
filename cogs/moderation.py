@@ -150,7 +150,7 @@ class moderation(commands.Cog):
                     time = None
                     await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
                     
-                await user.ban(reason=reason)
+                await user.ban(reason=reason, delete_message_days = 0)
 
         else:
             await ctx.send("Unable to ban a user who's already banned")
