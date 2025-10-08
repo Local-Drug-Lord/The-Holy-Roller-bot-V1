@@ -82,7 +82,10 @@ class moderation(commands.Cog):
                 Logging_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
-                    await user.send(f"You've been kicked from **{server}**", file=discord.File("Images/kick.gif"))
+                    try:
+                        await user.send(f"You've been kicked from **{server}**", file=discord.File("Images/kick.gif"))
+                    except discord.Forbidden:
+                        pass
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been kicked.\nPlease consider setting up the logging feature by running "/settings channels".')
                     else:
@@ -91,7 +94,10 @@ class moderation(commands.Cog):
                 else:
                     if ctx.interaction == None:
                         reason = " ".join(ctx.message.content.split()[2:])
-                    await user.send(f"You've been kicked from **{server}** for **{reason}**", file=discord.File("Images/kick.gif"))
+                    try:
+                        await user.send(f"You've been kicked from **{server}** for **{reason}**", file=discord.File("Images/kick.gif"))
+                    except discord.Forbidden:
+                        pass
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been kicked for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
                     else:
@@ -130,16 +136,27 @@ class moderation(commands.Cog):
                 Logging_channel = await get_logging_channel(self, ctx)
 
                 if reason == None:
-                    await user.send(f"You've been banned from **{server}**", file=discord.File("Images/ban.gif"))
+
+                    try:
+                        await user.send(f"You've been banned from **{server}**", file=discord.File("Images/ban.gif"))
+                    except discord.Forbidden:
+                        pass
+
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been banned.\nPlease consider setting up the logging feature by running "/settings channels".')
                     else:
                         await ctx.send(f'User {user.mention} has been banned.')
 
                 else:
+                    
                     if ctx.interaction == None:
                         reason = " ".join(ctx.message.content.split()[2:])
-                    await user.send(f"You've been banned from **{server}** for **{reason}**", file=discord.File("Images/ban.gif"))
+
+                    try:
+                        await user.send(f"You've been banned from **{server}** for **{reason}**", file=discord.File("Images/ban.gif"))
+                    except discord.Forbidden:
+                        pass
+                    
                     if Logging_channel == False:
                         await ctx.send(f'User {user.mention} has been banned for **{reason}**.\nPlease consider setting up the logging feature by running "/settings channels".')
                     else:
@@ -256,13 +273,17 @@ class moderation(commands.Cog):
             if reason == None:
                 try:
                     await user.send(f"You've been muted from **{server}**", file=discord.File("Images/mute.gif"))
-                    await ctx.send(f'User {user.mention} has been muted.')
-                except:
-                    await ctx.send(f'User {user.mention} has been muted.\n-# (Failed to send DM to user)')
+                except discord.Forbidden:
+                    pass    
+                await ctx.send(f'User {user.mention} has been muted.')
             else:
                 if ctx.interaction == None:
                     reason = " ".join(ctx.message.content.split()[2:])
-                await user.send(f"You've been muted from **{server}** for **{reason}**", file=discord.File("Images/mute.gif"))
+                try:
+                    await user.send(f"You've been muted from **{server}** for **{reason}**", file=discord.File("Images/mute.gif"))
+                except discord.Forbidden:
+                    pass
+                
                 await ctx.send(f'User {user.mention} has been muted for **{reason}**.')
 
             if Logging_channel:
@@ -309,7 +330,7 @@ class moderation(commands.Cog):
     @kick.error
     async def kick_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, commands.BotMissingPermissions):
@@ -322,14 +343,14 @@ class moderation(commands.Cog):
             await ctx.send("You're missing one or more required arguments", ephemeral=True)
             return 
         else:
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
 
     @ban.error
     async def ban_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, commands.BotMissingPermissions):
@@ -342,14 +363,14 @@ class moderation(commands.Cog):
             await ctx.send("You're missing one or more required arguments", ephemeral=True)
             return 
         else:
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
 
     @unban.error
     async def unban_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, commands.BotMissingPermissions):
@@ -362,14 +383,14 @@ class moderation(commands.Cog):
             await ctx.send("You're missing one or more required arguments", ephemeral=True)
             return 
         else:
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         
     @mute.error
     async def mute_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, commands.BotMissingPermissions):
@@ -382,14 +403,14 @@ class moderation(commands.Cog):
             await ctx.send("You're missing one or more required arguments", ephemeral=True)
             return 
         else:
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
     
     @unmute.error
     async def unmute_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
         elif isinstance(error, commands.BotMissingPermissions):
@@ -402,7 +423,7 @@ class moderation(commands.Cog):
             await ctx.send("You're missing one or more required arguments", ephemeral=True)
             return 
         else:
-            await ctx.send("There was an error executing this command, please contact developer")
+            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
             logging.error("----!!ERROR!!----")
             raise error
 
