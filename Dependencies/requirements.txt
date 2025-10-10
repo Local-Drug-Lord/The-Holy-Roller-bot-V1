@@ -3,7 +3,7 @@ aiohttp==3.13.0
 aiosignal==1.4.0
 asyncpg==0.30.0
 attrs==25.4.0
-discord.py==2.6.3
+discord.py==2.6.4
 frozenlist==1.8.0
 idna==3.10
 multidict==6.6.4
