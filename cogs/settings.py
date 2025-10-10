@@ -522,28 +522,67 @@ class settings(commands.Cog):
         await ctx.send(embed=show_embed)
         return
 
+    # Confirmation View for Deletion
+    class ConfirmDeleteView(discord.ui.View):
+        def __init__(self, on_confirm, on_cancel, author_id, timeout=60):
+            super().__init__(timeout=timeout)
+            self.on_confirm = on_confirm
+            self.on_cancel = on_cancel
+            self.author_id = author_id
+
+        @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
+        async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id != self.author_id:
+                await interaction.response.send_message("You are not allowed to use this button.", ephemeral=True)
+                return
+            await self.on_confirm(interaction)
+            self.stop()
+
+        @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+        async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+            if interaction.user.id != self.author_id:
+                await interaction.response.send_message("You are not allowed to use this button.", ephemeral=True)
+                return
+            await interaction.response.edit_message(content="Action canceled.", view=None)
+            await self.on_cancel(interaction)
+            self.stop()
+
     #delete
     @group.command(name="delete", description="Delete/reset a specific setting or all settings")
     @app_commands.checks.has_permissions(administrator=True)
     async def delete(self, interaction: discord.Interaction, setting: typing.Literal["Logging/Logs", "Welcome_channel", "Goodbye_channel", "Prefix", "All"]):
         guild_id = interaction.guild.id
         author_id = interaction.user.id
-        await delete_log_entry(self, author_id, guild_id, None, setting)
-        if setting == "Logging/Logs":
-            await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
-            await interaction.response.send_message("Logging channel setting has been reset.")
-        elif setting == "Welcome":
-            await self.pool.execute('UPDATE info SET wlc_id = NULL WHERE guild_id = $1', guild_id)
-            await interaction.response.send_message("Welcome channel setting have been reset.")
-        elif setting == "Goodbye":
-            await self.pool.execute('UPDATE info SET bye_id = NULL WHERE guild_id = $1', guild_id)
-            await interaction.response.send_message("Goodbye channel setting have been reset.")
-        elif setting == "Prefix":
-            await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
-            await interaction.response.send_message('Prefix setting has been reset to default (!).')
-        elif setting == "All":
-            await self.pool.execute('UPDATE info SET log_id = NULL, wlc_id = NULL, bye_id = NULL, prefix = $1 WHERE guild_id = $2', '!', guild_id)
-            await interaction.response.send_message("All channel settings have been deleted for this server.")
+
+        async def on_confirm(interaction_confirm):
+            await delete_log_entry(self, author_id, guild_id, None, setting)
+            if setting == "Logging/Logs":
+                await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.response.edit_message(content="Logging channel setting has been reset.", view=None)
+            elif setting == "Welcome":
+                await self.pool.execute('UPDATE info SET wlc_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.response.edit_message(content="Welcome channel setting have been reset.", view=None)
+            elif setting == "Goodbye":
+                await self.pool.execute('UPDATE info SET bye_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.response.edit_message(content="Goodbye channel setting have been reset.", view=None)
+            elif setting == "Prefix":
+                await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
+                await interaction_confirm.response.edit_message(content='Prefix setting has been reset to default (!).', view=None)
+            elif setting == "All":
+                await self.pool.execute('UPDATE info SET log_id = NULL, wlc_id = NULL, bye_id = NULL, prefix = $1 WHERE guild_id = $2', '!', guild_id)
+                await interaction_confirm.response.edit_message(content="All channel settings have been deleted for this server.", view=None)
+
+        async def on_cancel(interaction_cancel):
+            pass  # No further action needed
+
+        view = self.ConfirmDeleteView(on_confirm, on_cancel, author_id)
+        async def on_timeout():
+            try:
+                await interaction.edit_original_response(content="You were too slow to respond, request has timed out.", view=None)
+            except Exception:
+                pass
+        view.on_timeout = on_timeout
+        await interaction.response.send_message("Do you wish to continue with this action?\n-# This is irreversible meaning it can't be reverted.", view=view)
         return
 
     #Prefix
@@ -553,24 +592,38 @@ class settings(commands.Cog):
         guild_id = ctx.guild.id
         author_id = ctx.author.id
         setting = setting.lower()
-        await delete_log_entry (self, author_id, guild_id, None, setting)
-        if setting in {"logging", "logs", "log"}:
-            await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
-            await ctx.send("Logging channel setting has been reset.")
-        elif setting in {"welcome", "wlc"}:
-            await self.pool.execute('UPDATE info SET wlc_id = NULL WHERE guild_id = $1', guild_id)
-            await ctx.send("Welcome channel setting have been reset.")
-        elif setting in {"goodbye", "bye"}:
-            await self.pool.execute('UPDATE info SET bye_id = NULL WHERE guild_id = $1', guild_id)
-            await ctx.send("Goodbye channel setting have been reset.")
-        elif setting in {"prefix"}:
-            await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
-            await ctx.send('Prefix setting has been reset to default (!).')
-        elif setting == "all":
-            await self.pool.execute('UPDATE info SET log_id = NULL, wlc_id = NULL, bye_id = NULL, prefix = $1 WHERE guild_id = $2', '!', guild_id)
-            await ctx.send("All channel setting have been deleted for this server.")
-        else:
-            await ctx.send("Invalid setting. Use logging, welcome, goodbye, prefix, or all.")
+
+        async def on_confirm(interaction_confirm):
+            await delete_log_entry(self, author_id, guild_id, None, setting)
+            if setting in {"logging", "logs", "log"}:
+                await self.pool.execute('UPDATE info SET log_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.edit_original_response(content="Logging channel setting has been reset.", view=None)
+            elif setting in {"welcome", "wlc"}:
+                await self.pool.execute('UPDATE info SET wlc_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.edit_original_response(content="Welcome channel setting have been reset.", view=None)
+            elif setting in {"goodbye", "bye"}:
+                await self.pool.execute('UPDATE info SET bye_id = NULL WHERE guild_id = $1', guild_id)
+                await interaction_confirm.edit_original_response(content="Goodbye channel setting have been reset.", view=None)
+            elif setting in {"prefix"}:
+                await self.pool.execute('UPDATE info SET prefix = $1 WHERE guild_id = $2', '!', guild_id)
+                await interaction_confirm.edit_original_response(content='Prefix setting has been reset to default (!).', view=None)
+            elif setting == "all":
+                await self.pool.execute('UPDATE info SET log_id = NULL, wlc_id = NULL, bye_id = NULL, prefix = $1 WHERE guild_id = $2', '!', guild_id)
+                await interaction_confirm.edit_original_response(content="All channel setting have been deleted for this server.", view=None)
+            else:
+                await interaction_confirm.edit_original_response(content="Invalid setting. Use logging, welcome, goodbye, prefix, or all.", view=None)
+
+        async def on_cancel(interaction_cancel):
+            pass  # No further action needed
+
+        view = self.ConfirmDeleteView(on_confirm, on_cancel, author_id)
+        async def on_timeout():
+            try:
+                await ctx.send("You were too slow to respond, request has timed out.")
+            except Exception:
+                pass
+        view.on_timeout = on_timeout
+        await ctx.send("Do you wish to continue with this action?\n-# This is irreversible meaning it can't be reverted.", view=view)
         return
 
     #Delete_message
@@ -579,43 +632,57 @@ class settings(commands.Cog):
     async def delete_message(self, interaction: discord.Interaction, message_type: typing.Literal["Welcome", "Goodbye"], setting: typing.Literal["Attachment", "Title", "Message", "Color", "All"]):
         guild_id = interaction.guild.id
         author_id = interaction.user.id
-        await delete_log_entry(self, author_id, guild_id, message_type, setting)
-        if message_type == "Welcome":
-            if setting == "Attachment":
-                await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Welcome image has been reset.")
-            elif setting == "Title":
-                await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Welcome title has been reset.")
-            elif setting == "Message":
-                await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Welcome message has been reset.")
-            elif setting == "Color":
-                await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Welcome color has been reset.")
-            elif setting == "All":
-                await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("All welcome message settings have been reset.")
-        elif message_type == "Goodbye":
-            if setting == "Attachment":
-                await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Goodbye image has been reset.")
-            elif setting == "Title":
-                await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Goodbye title has been reset.")
-            elif setting == "Message":
-                await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Goodbye message has been reset.")
-            elif setting == "Color":
-                await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("Goodbye color has been reset.")
-            elif setting == "All":
-                await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
-                await interaction.response.send_message("All goodbye message settings have been reset.")
-        else:
-            await interaction.response.send_message("Invalid choice.", ephemeral=True)
+
+        async def on_confirm(interaction_confirm):
+            await delete_log_entry(self, author_id, guild_id, message_type, setting)
+            if message_type == "Welcome":
+                if setting == "Attachment":
+                    await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Welcome image has been reset.", view=None)
+                elif setting == "Title":
+                    await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Welcome title has been reset.", view=None)
+                elif setting == "Message":
+                    await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Welcome message has been reset.", view=None)
+                elif setting == "Color":
+                    await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Welcome color has been reset.", view=None)
+                elif setting == "All":
+                    await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="All welcome message settings have been reset.", view=None)
+            elif message_type == "Goodbye":
+                if setting == "Attachment":
+                    await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Goodbye image has been reset.", view=None)
+                elif setting == "Title":
+                    await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Goodbye title has been reset.", view=None)
+                elif setting == "Message":
+                    await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Goodbye message has been reset.", view=None)
+                elif setting == "Color":
+                    await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="Goodbye color has been reset.", view=None)
+                elif setting == "All":
+                    await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.response.edit_message(content="All goodbye message settings have been reset.", view=None)
+            else:
+                await interaction_confirm.response.edit_message(content="Invalid choice.", view=None)
+
+        async def on_cancel(interaction_cancel):
+            pass  # No further action needed
+
+        view = self.ConfirmDeleteView(on_confirm, on_cancel, author_id)
+        async def on_timeout():
+            try:
+                await interaction.edit_original_response(content="You were too slow to respond, request has timed out.", view=None)
+            except Exception:
+                pass
+        view.on_timeout = on_timeout
+        await interaction.response.send_message("Do you wish to continue with this action?\n-# This is irreversible meaning it can't be reverted.", view=view)
         return
-    
+
     #Prefix
     @commands.command(name="delete_message", aliases=["reset_message"])
     @app_commands.checks.has_permissions(administrator=True)
@@ -624,41 +691,55 @@ class settings(commands.Cog):
         author_id = ctx.author.id
         message_type = message_type.lower()
         setting = setting.lower()
-        await delete_log_entry(self, author_id, guild_id, message_type, setting)
-        if message_type in {"welcome", "wlc"}:
-            if setting == "attachment":
-                await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Welcome image has been reset.")
-            elif setting == "title":
-                await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Welcome title has been reset.")
-            elif setting == "message":
-                await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Welcome message has been reset.")
-            elif setting == "color":
-                await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Welcome color has been reset.")
-            elif setting == "all":
-                await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("All welcome message settings have been reset.")
-        elif message_type in {"goodbye", "bye"}:
-            if setting == "attachment":
-                await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Goodbye image has been reset.")
-            elif setting == "title":
-                await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Goodbye title has been reset.")
-            elif setting == "message":
-                await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Goodbye message has been reset.")
-            elif setting == "color":
-                await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("Goodbye color has been reset.")
-            elif setting == "all":
-                await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
-                await ctx.send("All goodbye message settings have been reset.")
-        else:
-            await ctx.send("Invalid choice. Use welcome/goodbye and attachment/title/message/color/all.")
+
+        async def on_confirm(interaction_confirm):
+            await delete_log_entry(self, author_id, guild_id, message_type, setting)
+            if message_type in {"welcome", "wlc"}:
+                if setting == "attachment":
+                    await self.pool.execute('UPDATE info SET wlc_pic = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Welcome image has been reset.", view=None)
+                elif setting == "title":
+                    await self.pool.execute('UPDATE info SET wlc_title = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Welcome title has been reset.", view=None)
+                elif setting == "message":
+                    await self.pool.execute('UPDATE info SET wlc_msg = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Welcome message has been reset.", view=None)
+                elif setting == "color":
+                    await self.pool.execute('UPDATE info SET wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Welcome color has been reset.", view=None)
+                elif setting == "all":
+                    await self.pool.execute('UPDATE info SET wlc_pic = NULL, wlc_title = NULL, wlc_msg = NULL, wlc_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="All welcome message settings have been reset.", view=None)
+            elif message_type in {"goodbye", "bye"}:
+                if setting == "attachment":
+                    await self.pool.execute('UPDATE info SET bye_pic = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Goodbye image has been reset.", view=None)
+                elif setting == "title":
+                    await self.pool.execute('UPDATE info SET bye_title = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Goodbye title has been reset.", view=None)
+                elif setting == "message":
+                    await self.pool.execute('UPDATE info SET bye_msg = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Goodbye message has been reset.", view=None)
+                elif setting == "color":
+                    await self.pool.execute('UPDATE info SET bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="Goodbye color has been reset.", view=None)
+                elif setting == "all":
+                    await self.pool.execute('UPDATE info SET bye_pic = NULL, bye_title = NULL, bye_msg = NULL, bye_rgb = NULL WHERE guild_id = $1', guild_id)
+                    await interaction_confirm.edit_original_response(content="All goodbye message settings have been reset.", view=None)
+            else:
+                await interaction_confirm.edit_original_response(content="Invalid choice. Use welcome/goodbye and attachment/title/message/color/all.", view=None)
+
+        async def on_cancel(interaction_cancel):
+            pass  # No further action needed
+
+        view = self.ConfirmDeleteView(on_confirm, on_cancel, author_id)
+        async def on_timeout():
+            try:
+                await ctx.send("You were too slow to respond, request has timed out.")
+            except Exception:
+                pass
+        view.on_timeout = on_timeout
+        await ctx.send("Do you wish to continue with this action?\n-# This is irreversible meaning it can't be reverted.", view=view)
         return
 
     @channels.error
