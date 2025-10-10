@@ -30,7 +30,7 @@ class issue(commands.Cog):
 
     @ping.error
     async def ping_error(self, ctx: commands.Context, error):
-        await ctx.send("There was an error executing this command, please contact developer")
+        await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
         logging.error("----!!ERROR!!----")
         raise error 
 
