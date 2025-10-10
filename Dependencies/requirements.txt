@@ -1,5 +1,5 @@
 aiohappyyeyeballs==2.6.1
-aiohttp==3.12.15
+aiohttp==3.13.0
 aiosignal==1.4.0
 asyncpg==0.30.0
 attrs==25.3.0
