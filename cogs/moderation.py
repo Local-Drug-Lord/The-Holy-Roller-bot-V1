@@ -1,6 +1,7 @@
 import discord
 import typing
 import logging
+import asyncio
 from discord import File
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions, CheckFailure
@@ -8,15 +9,14 @@ from datetime import datetime, timezone
 from datetime import timedelta
 
 logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
-#time
 
+#Time
 def current_time():
     now = datetime.now(timezone.utc)
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     return current_time
 
 #Get logging channel
-
 async def get_logging_channel(self, ctx):
     logging_channel = await self.pool.fetchrow('SELECT log_id FROM info WHERE guild_id = $1', ctx.guild.id)
     try:
@@ -25,37 +25,45 @@ async def get_logging_channel(self, ctx):
     except:
         logging_channel = False
     return logging_channel
-
-#Make log entry
-
-async def log_entry(self, ctx, user, action, author_id, reason, time, channel):
-    author_name = await self.bot.fetch_user(int(author_id))
-
-    image_file = File("Images/moderation_icon.png", filename="moderation_icon.png")
-    log_entry_embed = discord.Embed(title="Moderation action!", color=discord.Color.from_rgb(140,27,27))
-    if reason == None:
-        log_entry_embed.add_field(name="", value=f"User **{user}** was {action} by **{author_name}**.", inline=True)
-    else:
-        log_entry_embed.add_field(name="", value=f"User **{user}** was {action} by **{author_name}** for **{reason}**.", inline=True)
-    if action == "muted":
-        log_entry_embed.add_field(name="", value= f"Time: **{time}**", inline=False)
-    log_entry_embed.set_thumbnail(url="attachment://moderation_icon.png") 
-    log_entry_embed.add_field(name="", value= f"User ID: **{user.id}**")
-    log_entry_embed.set_footer(text=f"Action made by: {author_name} ({author_id}).\nUTC: {current_time()}")
-    await channel.send(file=image_file, embed=log_entry_embed)
     
 class moderation(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
         self.pool = bot.pool
+        if not hasattr(bot, 'recent_mod_actions'):
+            bot.recent_mod_actions = {}
+
+    # Register action in audit logs
+    async def _register_action(self, guild_id: int, user_id: int, action: str, author_id: typing.Optional[int] = None, reason: typing.Optional[str] = None, time_val: typing.Optional[str] = None, log_channel_id: typing.Optional[int] = None, ttl: int = 8):
+        try:
+            now = datetime.now(timezone.utc)
+            bot_store = getattr(self.bot, 'recent_mod_actions', None)
+            if bot_store is None:
+                self.bot.recent_mod_actions = {}
+                bot_store = self.bot.recent_mod_actions
+
+            bot_store[(int(guild_id), int(user_id))] = (action, now, author_id, reason, time_val, log_channel_id)
+
+            asyncio.create_task(self._clear_action_after(guild_id, int(user_id), ttl))
+        except Exception:
+            logging.exception("_register_action failed")
+
+    async def _clear_action_after(self, guild_id: int, user_id: int, ttl: int):
+        await asyncio.sleep(ttl)
+        try:
+            bot_store = getattr(self.bot, 'recent_mod_actions', None)
+            if bot_store is None:
+                return
+            bot_store.pop((guild_id, int(user_id)), None)
+        except Exception:
+            logging.exception("_clear_action_after failed")
 
     @commands.Cog.listener()
     async def on_ready(self):
         await self.bot.tree.sync()
         logging.info("---|moderation cog loaded!|---   %s", current_time())
     
-# kick
-
+    # kick
     @commands.hybrid_command(name = "kick", description='Kicks a member', aliases=["Kick"])
     @commands.has_permissions(kick_members = True)
     @commands.guild_only()
@@ -106,12 +114,15 @@ class moderation(commands.Cog):
                 if Logging_channel:
                     action = "kicked"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
+                    # register so the logging cog can suppress its duplicate message
+                    try:
+                        await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
+                    except Exception:
+                        logging.exception("failed to register kick action")
                 
                 await user.kick(reason=reason)
 
-# Ban
-
+    # Ban
     @commands.hybrid_command(name = "ban", description='Bans a member', aliases=["Ban"])
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
@@ -165,15 +176,18 @@ class moderation(commands.Cog):
                 if Logging_channel:
                     action = "banned"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
+                    try:
+                        # register metadata only; logging cog will create the moderation embed
+                        await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
+                    except Exception:
+                        logging.exception("failed to register ban action")
                     
                 await user.ban(reason=reason, delete_message_days = 0)
 
         else:
             await ctx.send("Unable to ban a user who's already banned")
    
-# Unban 
-
+    # Unban 
     @commands.hybrid_command(name = "unban", description='unbans a member', aliases = ["Unban","uban","Uban"])
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
@@ -215,12 +229,14 @@ class moderation(commands.Cog):
                 if Logging_channel:
                     action = "unbanned"
                     time = None
-                    await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
+                    try:
+                        await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
+                    except Exception:
+                        logging.exception("failed to register unban action")
                     
                 await ctx.guild.unban(discord.Object(int(user_id)))
 
-# Mute 
-
+    # Mute 
     @commands.hybrid_command(name = "mute", description='Mutes a member', aliases = ["Mute"])
     @commands.has_permissions(moderate_members = True)
     @commands.guild_only()
@@ -289,12 +305,14 @@ class moderation(commands.Cog):
             if Logging_channel:
                 action = "muted"
                 time = tdelta
-                await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
+                try:
+                    await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
+                except Exception:
+                    logging.exception("failed to register mute action")
 
             await user.timeout(tdelta)
 
-# Unmute 
-
+    # Unmute 
     @commands.hybrid_command(name = "unmute", description='Unmutes a member', aliases = ["Unmute", "Umute", "umute"])
     @commands.has_permissions(moderate_members = True)
     @commands.guild_only()
@@ -322,11 +340,13 @@ class moderation(commands.Cog):
             if Logging_channel:
                 action = "unmuted"
                 time = None
-                await log_entry(self, ctx, user, action, author_id, reason, time, Logging_channel)
+                try:
+                    await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
+                except Exception:
+                    logging.exception("failed to register unmute action")
             await user.edit(timed_out_until=None)
 
-# Errors 
-
+    # Errors 
     @kick.error
     async def kick_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandInvokeError):
