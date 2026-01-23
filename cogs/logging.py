@@ -98,6 +98,18 @@ async def get_logging_channel(cog, guild_id):
 
 # Produce simple before/after lists for attribute diffs used in some update logs
 
+def format_lockdown_status(dt_value):
+    """Format lockdown datetime as 'Enabled until YYYY-MM-DD HH:MM:SS' or 'Disabled'."""
+    if dt_value is None:
+        return "Disabled"
+    try:
+        if isinstance(dt_value, datetime):
+            return dt_value.strftime("Enabled until %Y-%m-%d %H:%M:%S UTC")
+        else:
+            return "Disabled"
+    except Exception:
+        return "Disabled"
+
 def diff_attrs(before, after, attrs):
     before_lines = []
     after_lines = []
@@ -105,11 +117,21 @@ def diff_attrs(before, after, attrs):
         try:
             b = getattr(before, a, None)
             c = getattr(after, a, None)
-            b_str = str(b) if b is not None else 'None'
-            c_str = str(c) if c is not None else 'None'
+            
+            # Special formatting for lockdown attributes
+            if a in ['invites_disabled_until', 'dms_disabled_until']:
+                b_str = format_lockdown_status(b)
+                c_str = format_lockdown_status(c)
+                # Use friendly names instead of technical attribute names
+                display_name = "Invites" if a == 'invites_disabled_until' else "DMs"
+            else:
+                b_str = str(b) if b is not None else 'None'
+                c_str = str(c) if c is not None else 'None'
+                display_name = a
+            
             if b_str != c_str:
-                before_lines.append(f"{a}: {b_str}")
-                after_lines.append(f"{a}: {c_str}")
+                before_lines.append(f"{display_name}: {b_str}")
+                after_lines.append(f"{display_name}: {c_str}")
         except Exception:
             continue
     return before_lines, after_lines
@@ -1368,7 +1390,7 @@ class Logging(commands.Cog):
         log_channel = await get_logging_channel(self, after.id)
         if not log_channel:
             return
-        attrs = ["name", "region", "icon", "verification_level", "default_notifications", "afk_channel"]
+        attrs = ["name", "region", "icon", "verification_level", "default_notifications", "afk_channel", "invites_disabled_until", "dms_disabled_until"]
         before_lines, after_lines = diff_attrs(before, after, attrs)
         embed = discord.Embed(
             title="Server Settings Updated",

@@ -26,6 +26,11 @@ def help_embed(self):
     embed.add_field(name="*/unban*", value="unbans a member.", inline=True)
     embed.add_field(name="*/unmute*", value="unmutes a member.", inline=True)
 
+    embed.add_field(name="**---| Raid Protection |---**", value="", inline=False)
+    embed.add_field(name="*/raid protection enable*", value="Enable automatic raid detection for this server.", inline=True)
+    embed.add_field(name="*/raid protection disable*", value="Disable automatic raid detection for this server.", inline=True)
+    embed.add_field(name="*/raid protection info*", value="View raid detection settings and status.", inline=True)
+
     embed.add_field(name="**---| Other      |---**", value="", inline=False)
     embed.add_field(name="*/help*", value="Shows this message, use /help settings for help with settings.", inline=True)
     embed.add_field(name="*/ping*", value="Shows the response time of the bot.", inline=True)
