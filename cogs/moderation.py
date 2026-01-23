@@ -120,7 +120,7 @@ class moderation(commands.Cog):
                     except Exception:
                         logging.exception("failed to register kick action")
                 
-                await user.kick(reason=reason)
+                await ctx.guild.kick(user, reason=reason)
 
     # Ban
     @commands.hybrid_command(name = "ban", description='Bans a member', aliases=["Ban"])
@@ -182,7 +182,7 @@ class moderation(commands.Cog):
                     except Exception:
                         logging.exception("failed to register ban action")
                     
-                await user.ban(reason=reason, delete_message_days = 0)
+                await ctx.guild.ban(user, reason=reason, delete_message_days=0)
 
         else:
             await ctx.send("Unable to ban a user who's already banned")
@@ -310,7 +310,11 @@ class moderation(commands.Cog):
                 except Exception:
                     logging.exception("failed to register mute action")
 
-            await user.timeout(tdelta)
+            try:
+                member = await ctx.guild.fetch_member(user_id)
+                await member.edit(timed_out_until=discord.utils.utcnow() + tdelta)
+            except discord.NotFound:
+                await ctx.send("Unable to mute a member who's not in the server.")
 
     # Unmute 
     @commands.hybrid_command(name = "unmute", description='Unmutes a member', aliases = ["Unmute", "Umute", "umute"])
@@ -344,7 +348,11 @@ class moderation(commands.Cog):
                     await self._register_action(ctx.guild.id, user_id, action, author_id=author_id, reason=reason, time_val=time, log_channel_id=(Logging_channel.id if Logging_channel else None))
                 except Exception:
                     logging.exception("failed to register unmute action")
-            await user.edit(timed_out_until=None)
+            try:
+                member = await ctx.guild.fetch_member(user_id)
+                await member.edit(timed_out_until=None)
+            except discord.NotFound:
+                await ctx.send("Unable to unmute a member who's not in the server.")
 
     # Errors 
     @kick.error
