@@ -21,6 +21,7 @@ To make the bot work properly you need a Postgre SQL database, you'll also need 
 - wlc_hex (text)
 - bye_hex (text)
 - prefix (text)
+- raid_response_enabled (boolean) (not NULL) (default set to false)
 - notes (text) (Optional)
 
 ## Additional links

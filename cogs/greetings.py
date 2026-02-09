@@ -1,9 +1,18 @@
 import discord
 import logging
 from discord.ext import commands
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import re
 
 logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
+
+# ============== RAID LOGIC ==============
+# Dictionary to track join timestamps per guild for raid detection
+raid_join_tracker = {}
+# Raid detection thresholds (hardcoded)
+RAID_JOIN_THRESHOLD = 5  # Number of joins to trigger alert
+RAID_DETECTION_WINDOW = 2  # Seconds window for threshold
+# ========================================
 
 #time
 def current_time ():
@@ -95,6 +104,46 @@ async def get_goodbye(guild_id, goodbye, Type, member, guild_name):
             goodbye_image = False
         return goodbye_image
 
+# ============== RAID LOGIC ==============
+def is_suspicious_account(member) -> dict:
+    flags = {
+        'new_account': False,
+        'no_avatar': False,
+        'bot_like_name': False
+    }
+    
+    # Check if account created less than 7 days ago
+    account_age = datetime.now(timezone.utc) - member.created_at
+    if account_age < timedelta(days=7):
+        flags['new_account'] = True
+    
+    # Check if account has no avatar
+    if member.avatar is None:
+        flags['no_avatar'] = True
+    
+    return flags
+
+async def check_raid_response_enabled(guild_id, pool) -> bool:
+    try:
+        result = await pool.fetchrow(
+            'SELECT raid_response_enabled FROM info WHERE guild_id = $1', 
+            guild_id
+        )
+        if result:
+            return result['raid_response_enabled']
+    except Exception as e:
+        logging.error(f"Error checking raid response status: {e}")
+    return True  # Default to enabled if not found
+
+def get_suspicious_flags_string(flags: dict) -> str:
+    flag_list = []
+    if flags['new_account']:
+        flag_list.append("🟠 New Account (< 7 days)")
+    if flags['no_avatar']:
+        flag_list.append("🟠 No Avatar")
+    return " | ".join(flag_list) if flag_list else "No red flags"
+# ========================================
+
 class greetings(commands.Cog):
     def __init__(self, bot: commands.bot):
         self.bot = bot
@@ -107,6 +156,35 @@ class greetings(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        # ============== RAID LOGIC ==============
+        # Check if raid response is enabled
+        raid_enabled = await check_raid_response_enabled(member.guild.id, self.pool)
+        
+        if raid_enabled:
+            # Initialize guild tracker if not exists
+            if member.guild.id not in raid_join_tracker:
+                raid_join_tracker[member.guild.id] = []
+            
+            # Add current join with timestamp
+            current_time_obj = datetime.now(timezone.utc)
+            raid_join_tracker[member.guild.id].append({
+                'timestamp': current_time_obj,
+                'member': member
+            })
+            
+            # Remove joins older than detection window
+            cutoff_time = current_time_obj - timedelta(seconds=RAID_DETECTION_WINDOW)
+            raid_join_tracker[member.guild.id] = [
+                j for j in raid_join_tracker[member.guild.id]
+                if j['timestamp'] > cutoff_time
+            ]
+            
+            # Check if raid threshold exceeded
+            if len(raid_join_tracker[member.guild.id]) >= RAID_JOIN_THRESHOLD:
+                # Trigger raid response (will be handled in Raid.py)
+                await self.trigger_raid_alert(member.guild, raid_join_tracker[member.guild.id])
+        # ========================================
+        
         guild_id = member.guild.id
         guild_name = member.guild
         Type = "channel"
@@ -135,6 +213,19 @@ class greetings(commands.Cog):
                     welcome_embed.set_image(url=image)
                 welcome_embed.set_footer(text=f"{member} ({member.id})\nUTC: {current_time()}")
                 await channel.send(member.mention, embed=welcome_embed)
+    
+    # ============== RAID LOGIC ==============
+    async def trigger_raid_alert(self, guild, joining_members):
+        try:
+            # Import here to avoid circular imports
+            from discord.ext import commands
+            raid_cog = self.bot.get_cog('raid')
+            
+            if raid_cog:
+                await raid_cog.execute_raid_response(guild, joining_members)
+        except Exception as e:
+            logging.error(f"Error triggering raid alert: {e}")
+    # ========================================
             
     @commands.Cog.listener()
     async def on_member_remove(self, member):
