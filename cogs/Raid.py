@@ -29,7 +29,6 @@ async def get_logging_channel(guild_id, pool, bot):
 
 # Get all admin members
 async def get_admin_members(guild):
-    """Get all members with administrator permission."""
     admins = []
     try:
         async for member in guild.fetch_members():
@@ -60,7 +59,6 @@ class raid(commands.Cog):
         app_commands.Choice(name="info", value="info")
     ])
     async def raid_protection_slash(self, interaction: discord.Interaction, protection: app_commands.Choice[str]):
-        """Manage raid protection settings."""
         if protection.value == "enable":
             await self._handle_raid_enable(interaction)
         elif protection.value == "disable":
@@ -71,7 +69,6 @@ class raid(commands.Cog):
     @commands.command(name="raid", aliases=["Raid"])
     @commands.has_permissions(administrator=True)
     async def raid_protection_prefix(self, ctx: commands.Context, action: str = None):
-        """Manage raid protection settings (prefix command)."""
         if not action:
             await ctx.send("Usage: `!raid [enable|disable|info]`")
             return
@@ -87,7 +84,6 @@ class raid(commands.Cog):
             await ctx.send(f"Unknown action `{action}`. Use: enable, disable, or info")
 
     async def _handle_raid_enable(self, interaction_or_ctx):
-        """Internal handler: Enable raid response."""
         is_slash = isinstance(interaction_or_ctx, discord.Interaction)
         guild_id = interaction_or_ctx.guild.id if is_slash else interaction_or_ctx.guild.id
         
@@ -112,7 +108,6 @@ class raid(commands.Cog):
             logging.error(f"Error enabling raid response: {e}")
 
     async def _handle_raid_disable(self, interaction_or_ctx):
-        """Internal handler: Disable raid response."""
         is_slash = isinstance(interaction_or_ctx, discord.Interaction)
         guild_id = interaction_or_ctx.guild.id if is_slash else interaction_or_ctx.guild.id
         
@@ -137,7 +132,6 @@ class raid(commands.Cog):
             logging.error(f"Error disabling raid response: {e}")
 
     async def _handle_raid_info(self, interaction_or_ctx):
-        """Internal handler: Display raid response info."""
         is_slash = isinstance(interaction_or_ctx, discord.Interaction)
         guild_id = interaction_or_ctx.guild.id if is_slash else interaction_or_ctx.guild.id
         
@@ -156,8 +150,8 @@ class raid(commands.Cog):
             )
             embed.add_field(name="Detection Threshold", value="4 joins in 2 seconds", inline=False)
             embed.add_field(name="Alerts", value="Logging channel + Admin DMs + Guild owner", inline=False)
-            embed.add_field(name="Lockdown", value="Disables invites and DMs for 1 hour", inline=False)
-            embed.add_field(name="Account Checks", value="New account (< 7 days), No avatar, Bot-like username", inline=False)
+            embed.add_field(name="Trigger actions", value="Disables invites and DMs for 1 hour", inline=False)
+            embed.add_field(name="Account Flags", value="New account (< 7 days), No avatar", inline=False)
             embed.set_footer(text=f"UTC: {current_time()}")
             embed.set_thumbnail(url="attachment://raid_icon.png")
             
@@ -238,7 +232,6 @@ class raid(commands.Cog):
             logging.error(f"Error executing raid response: {e}")
 
     async def _build_raid_alert_embed(self, guild, joining_members, is_dm=False) -> discord.Embed:
-        """Build the raid alert embed."""
         # Import here to avoid circular imports
         from cogs.Greetings import is_suspicious_account, get_suspicious_flags_string
         
@@ -284,7 +277,6 @@ class raid(commands.Cog):
         return embed
 
     async def _lockdown_guild(self, guild):
-        """Lock down guild by disabling invites and DMs."""
         try:
             lockdown_until = datetime.now(timezone.utc) + timedelta(hours=1)
             

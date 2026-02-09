@@ -10,7 +10,7 @@ logging.basicConfig(format='%(levelname)s:  %(message)s', level=logging.INFO)
 # Dictionary to track join timestamps per guild for raid detection
 raid_join_tracker = {}
 # Raid detection thresholds (hardcoded)
-RAID_JOIN_THRESHOLD = 4  # Number of joins to trigger alert
+RAID_JOIN_THRESHOLD = 5  # Number of joins to trigger alert
 RAID_DETECTION_WINDOW = 2  # Seconds window for threshold
 # ========================================
 
@@ -106,10 +106,6 @@ async def get_goodbye(guild_id, goodbye, Type, member, guild_name):
 
 # ============== RAID LOGIC ==============
 def is_suspicious_account(member) -> dict:
-    """
-    Check for suspicious account characteristics.
-    Returns dict with boolean flags for suspicious traits.
-    """
     flags = {
         'new_account': False,
         'no_avatar': False,
@@ -125,15 +121,9 @@ def is_suspicious_account(member) -> dict:
     if member.avatar is None:
         flags['no_avatar'] = True
     
-    # Check for bot-like username patterns (numbers at end, excessive numbers)
-    username = member.name.lower()
-    if re.search(r'\d{3,}', username) or re.search(r'[a-z]+\d+$', username):
-        flags['bot_like_name'] = True
-    
     return flags
 
 async def check_raid_response_enabled(guild_id, pool) -> bool:
-    """Check if raid response is enabled for this guild."""
     try:
         result = await pool.fetchrow(
             'SELECT raid_response_enabled FROM info WHERE guild_id = $1', 
@@ -146,14 +136,11 @@ async def check_raid_response_enabled(guild_id, pool) -> bool:
     return True  # Default to enabled if not found
 
 def get_suspicious_flags_string(flags: dict) -> str:
-    """Convert flags dict to readable string."""
     flag_list = []
     if flags['new_account']:
         flag_list.append("🟠 New Account (< 7 days)")
     if flags['no_avatar']:
         flag_list.append("🟠 No Avatar")
-    if flags['bot_like_name']:
-        flag_list.append("🟠 Bot-like Username")
     return " | ".join(flag_list) if flag_list else "No red flags"
 # ========================================
 
@@ -229,10 +216,6 @@ class greetings(commands.Cog):
     
     # ============== RAID LOGIC ==============
     async def trigger_raid_alert(self, guild, joining_members):
-        """
-        Trigger raid alert with detected members and flags.
-        This calls the actual raid response from Raid.py
-        """
         try:
             # Import here to avoid circular imports
             from discord.ext import commands

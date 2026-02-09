@@ -99,12 +99,11 @@ async def get_logging_channel(cog, guild_id):
 # Produce simple before/after lists for attribute diffs used in some update logs
 
 def format_lockdown_status(dt_value):
-    """Format lockdown datetime as 'Enabled until YYYY-MM-DD HH:MM:SS' or 'Disabled'."""
     if dt_value is None:
         return "Disabled"
     try:
         if isinstance(dt_value, datetime):
-            return dt_value.strftime("Enabled until %Y-%m-%d %H:%M:%S UTC")
+            return dt_value.strftime("Enabled until %Y-%m-%d %H:%M UTC")
         else:
             return "Disabled"
     except Exception:
@@ -1390,17 +1389,79 @@ class Logging(commands.Cog):
         log_channel = await get_logging_channel(self, after.id)
         if not log_channel:
             return
-        attrs = ["name", "region", "icon", "verification_level", "default_notifications", "afk_channel", "invites_disabled_until", "dms_disabled_until"]
+        
+        # Capture standard guild attribute changes
+        attrs = ["name", "region", "icon", "verification_level", "default_notifications", "afk_channel"]
         before_lines, after_lines = diff_attrs(before, after, attrs)
-        embed = discord.Embed(
-            title="Server Settings Updated",
-            description=f"Server `{before.name}` ({before.id}) was updated.",
-            color=discord.Color.orange(),
-            timestamp=datetime.now(timezone.utc)
-        )
-        desc = f"The settings of server `{before.name}` ({before.id}) were updated."
+        
+        # Get lockdown pause status from the Guild properties (exposed from _incidents_data)
+        # Properties: invites_paused_until and dms_paused_until (datetime or None)
         try:
-            embed = create_standard_update_embed("Server Settings Updated", desc, "\n".join(before_lines) or "None", "\n".join(after_lines) or "None", color=discord.Color.orange())
+            inv_before = getattr(before, 'invites_paused_until', None)
+        except Exception:
+            inv_before = None
+        
+        try:
+            inv_after = getattr(after, 'invites_paused_until', None)
+        except Exception:
+            inv_after = None
+        
+        try:
+            dms_before = getattr(before, 'dms_paused_until', None)
+        except Exception:
+            dms_before = None
+        
+        try:
+            dms_after = getattr(after, 'dms_paused_until', None)
+        except Exception:
+            dms_after = None
+        
+        # Log raw values for debugging
+        logging.info("on_guild_update (guild %s): inv_before=%s inv_after=%s dms_before=%s dms_after=%s", 
+                    after.id, inv_before, inv_after, dms_before, dms_after)
+        
+        # Format lockdown statuses
+        inv_before_str = format_lockdown_status(inv_before)
+        inv_after_str = format_lockdown_status(inv_after)
+        dms_before_str = format_lockdown_status(dms_before)
+        dms_after_str = format_lockdown_status(dms_after)
+        
+        # Always add these lines (even if not changed, for clarity on raid events)
+        before_lines.append(f"Paused invites: {inv_before_str}")
+        after_lines.append(f"Paused invites: {inv_after_str}")
+        before_lines.append(f"Paused DMs: {dms_before_str}")
+        after_lines.append(f"Paused DMs: {dms_after_str}")
+        
+        desc = f"The settings of server `{before.name}` ({before.id}) were updated."
+        
+        # Determine who made the change
+        executor_name = None
+        executor_id = None
+        
+        # If invites/DMs pause was activated by bot, attribute to raid protection
+        if (inv_after is not None and not inv_before) or (dms_after is not None and not dms_before):
+            executor_name = "Holy raid protection"
+            executor_id = self.bot.user.id if self.bot.user else "BOT"
+        else:
+            # Otherwise, try to find the user who made the change via audit log
+            try:
+                executor, reason = await find_audit_executor(self, after, discord.AuditLogAction.guild_update, after, window=60)
+                if executor:
+                    executor_name = str(executor)
+                    executor_id = executor.id
+            except Exception:
+                logging.debug("on_guild_update: failed to find audit executor")
+        
+        try:
+            embed = create_standard_update_embed(
+                "Server Settings Updated",
+                desc,
+                "\n".join(before_lines) or "None",
+                "\n".join(after_lines) or "None",
+                color=discord.Color.orange(),
+                executor_name=executor_name,
+                executor_id=executor_id
+            )
         except Exception:
             logging.exception("on_guild_update: failed to build standard embed, falling back")
             embed = discord.Embed(
@@ -1411,7 +1472,11 @@ class Logging(commands.Cog):
             )
             embed.add_field(name="Before", value="\n".join(before_lines) or "None", inline=False)
             embed.add_field(name="After", value="\n".join(after_lines) or "None", inline=False)
-            embed.set_footer(text=f"Action made by: Unknown.\nUTC: {current_time()}")
+            # Use executor info if available, otherwise Unknown
+            exec_name = executor_name or "Unknown"
+            exec_id = executor_id or "N/A"
+            embed.set_footer(text=f"Action made by: {exec_name} ({exec_id}).\nUTC: {current_time()}")
+        
         image_file = discord.File("Images/moderation_icon.png", filename="moderation_icon.png")  
         embed.set_thumbnail(url="attachment://moderation_icon.png")
         try:
