@@ -98,7 +98,6 @@ class raid(commands.Cog):
                 await interaction_or_ctx.response.send_message(msg, ephemeral=True)
             else:
                 await interaction_or_ctx.send(msg)
-            logging.info(f"Raid response enabled for guild {guild_id}")
         except Exception as e:
             msg = "❌ Error enabling raid response."
             if is_slash:
@@ -122,7 +121,6 @@ class raid(commands.Cog):
                 await interaction_or_ctx.response.send_message(msg, ephemeral=True)
             else:
                 await interaction_or_ctx.send(msg)
-            logging.info(f"Raid response disabled for guild {guild_id}")
         except Exception as e:
             msg = "❌ Error disabling raid response."
             if is_slash:
@@ -200,7 +198,6 @@ class raid(commands.Cog):
                     await log_channel.send(file=file, embed=alert_embed)
                 except:
                     await log_channel.send(embed=alert_embed)
-                logging.info(f"Raid alert sent to logging channel for guild {guild.id}")
             
             # Send to all admins via DM (deduplicated)
             admins = await get_admin_members(guild)
@@ -213,7 +210,6 @@ class raid(commands.Cog):
                 try:
                     await admin.send(embed=admin_embed)
                     notified_ids.add(admin.id)
-                    logging.info(f"Raid alert DM sent to {admin} ({admin.id})")
                 except:
                     logging.warning(f"Could not send raid DM to {admin} ({admin.id})")
             
@@ -221,7 +217,6 @@ class raid(commands.Cog):
             if guild.owner.id not in notified_ids:
                 try:
                     await guild.owner.send(embed=admin_embed)
-                    logging.info(f"Raid alert DM sent to guild owner {guild.owner} ({guild.owner.id})")
                 except:
                     logging.warning(f"Could not send raid DM to guild owner {guild.owner} ({guild.owner.id})")
             
@@ -285,7 +280,6 @@ class raid(commands.Cog):
                 dms_disabled_until=lockdown_until,
                 reason="Raid detected - automatic lockdown"
             )
-            logging.info(f"Guild {guild.id} locked down due to raid for 1 hour")
         except discord.Forbidden:
             logging.warning(f"No permission to lock down guild {guild.id}")
         except Exception as e:
