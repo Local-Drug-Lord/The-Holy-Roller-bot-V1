@@ -389,6 +389,8 @@ class Logging(commands.Cog):
             embed.set_footer(text=f"Action made by: {message.author} ({message.author.id}).\nUTC: {current_time()}")
 
             # If the message had attachments, try to include them (prefer images)
+            # Ensure `file_image` is always defined so later code can reference it safely
+            file_image = None
             try:
                 attachments = getattr(message, 'attachments', []) or []
                 if attachments:
@@ -448,6 +450,7 @@ class Logging(commands.Cog):
             embed = create_standard_update_embed("Message Edited", desc, before.content or "None", after.content or "None", color=discord.Color.orange())
 
             # If either version had attachments, include them. Prefer showing the 'before' image if available.
+            file_image = None
             try:
                 b_atts = getattr(before, 'attachments', []) or []
                 a_atts = getattr(after, 'attachments', []) or []
