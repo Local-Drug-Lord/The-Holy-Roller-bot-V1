@@ -389,7 +389,7 @@ class Logging(commands.Cog):
             embed.set_footer(text=f"Action made by: {message.author} ({message.author.id}).\nUTC: {current_time()}")
 
             # If the message had attachments, try to include them (prefer images)
-            # Ensure `file_image` is always defined so later code can reference it safely
+            # Initialize file_image before try block to prevent UnboundLocalError
             file_image = None
             try:
                 attachments = getattr(message, 'attachments', []) or []
@@ -397,6 +397,7 @@ class Logging(commands.Cog):
                     # find first image-like attachment
                     img_url = None
                     img_exts = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
+                    image_attachment = None
                     for a in attachments:
                         try:
                             ctype = getattr(a, 'content_type', None) or ''
@@ -405,14 +406,14 @@ class Logging(commands.Cog):
                         name = getattr(a, 'filename', '') or ''
                         if ctype.startswith('image') or name.lower().endswith(img_exts):
                             img_url = getattr(a, 'url', None)
+                            image_attachment = a
                             break
-                    file_image = None
-                    if img_url:
+                    if img_url and image_attachment:
                         # Prefer embedding the attachment as a file (works when attachment URLs are restricted)
                         try:
-                            data = await a.read()
-                            file_image = discord.File(io.BytesIO(data), filename=getattr(a, 'filename', 'attached_image'))
-                            embed.set_image(url=f"attachment://{getattr(a, 'filename', 'attached_image')}")
+                            data = await image_attachment.read()
+                            file_image = discord.File(io.BytesIO(data), filename=getattr(image_attachment, 'filename', 'attached_image'))
+                            embed.set_image(url=f"attachment://{getattr(image_attachment, 'filename', 'attached_image')}")
                         except Exception:
                             # fallback to remote URL if read() fails
                             try:
