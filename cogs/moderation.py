@@ -68,6 +68,9 @@ class moderation(commands.Cog):
     @commands.has_permissions(kick_members = True)
     @commands.guild_only()
     async def kick(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
+        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
+        if ctx.interaction:
+            await ctx.defer()
 
         try:
             user_id = user.id
@@ -127,6 +130,9 @@ class moderation(commands.Cog):
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
     async def ban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
+        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
+        if ctx.interaction:
+            await ctx.defer()
 
         try:
             user_id = user.id
@@ -191,8 +197,9 @@ class moderation(commands.Cog):
     @commands.hybrid_command(name = "unban", description='unbans a member', aliases = ["Unban","uban","Uban"])
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
-    async def unban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
-
+    async def unban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
+        if ctx.interaction:
+            await ctx.defer()
         try:
             user_id = user.id
         except:
@@ -357,62 +364,77 @@ class moderation(commands.Cog):
     # Errors 
     @kick.error
     async def kick_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
-            raise error
-        elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.send("The bot is missing permissions.", ephemeral=True)
-            return
-        elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("You don't have permissions to do that :)", ephemeral=True)
-            return 
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("You're missing one or more required arguments", ephemeral=True)
-            return 
-        else:
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
+        try:
+            if isinstance(error, commands.CommandInvokeError):
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+            elif isinstance(error, commands.BotMissingPermissions):
+                await ctx.send("The bot is missing permissions.", ephemeral=True)
+                return
+            elif isinstance(error, commands.MissingPermissions):
+                await ctx.send("You don't have permissions to do that :)", ephemeral=True)
+                return 
+            elif isinstance(error, commands.MissingRequiredArgument):
+                await ctx.send("You're missing one or more required arguments", ephemeral=True)
+                return 
+            else:
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+        except discord.NotFound:
+            # Interaction has expired; log the error but don't try to send a response
+            logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
 
     @ban.error
     async def ban_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
-            raise error
-        elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.send("The bot is missing permissions.", ephemeral=True)
-            return
-        elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("You don't have permissions to do that :)", ephemeral=True)
-            return 
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("You're missing one or more required arguments", ephemeral=True)
-            return 
-        else:
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
+        try:
+            if isinstance(error, commands.CommandInvokeError):
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+            elif isinstance(error, commands.BotMissingPermissions):
+                await ctx.send("The bot is missing permissions.", ephemeral=True)
+                return
+            elif isinstance(error, commands.MissingPermissions):
+                await ctx.send("You don't have permissions to do that :)", ephemeral=True)
+                return 
+            elif isinstance(error, commands.MissingRequiredArgument):
+                await ctx.send("You're missing one or more required arguments", ephemeral=True)
+                return 
+            else:
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+        except discord.NotFound:
+            # Interaction has expired; log the error but don't try to send a response
+            logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
 
     @unban.error
     async def unban_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
-            raise error
-        elif isinstance(error, commands.BotMissingPermissions):
-            await ctx.send("The bot is missing permissions.", ephemeral=True)
-            return
-        elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("You don't have permissions to do that :)", ephemeral=True)
-            return 
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("You're missing one or more required arguments", ephemeral=True)
-            return 
-        else:
-            await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
-            logging.error("----!!ERROR!!----")
+        try:
+            if isinstance(error, commands.CommandInvokeError):
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+            elif isinstance(error, commands.BotMissingPermissions):
+                await ctx.send("The bot is missing permissions.", ephemeral=True)
+                return
+            elif isinstance(error, commands.MissingPermissions):
+                await ctx.send("You don't have permissions to do that :)", ephemeral=True)
+                return 
+            elif isinstance(error, commands.MissingRequiredArgument):
+                await ctx.send("You're missing one or more required arguments", ephemeral=True)
+                return 
+            else:
+                await ctx.send("!!ERROR!! Please contact <@1184901953885585490>", ephemeral=True)
+                logging.error("----!!ERROR!!----")
+                raise error
+        except discord.NotFound:
+            # Interaction has expired; log the error but don't try to send a response
+            logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
         
     @mute.error
