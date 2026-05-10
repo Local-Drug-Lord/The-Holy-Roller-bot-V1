@@ -68,7 +68,6 @@ class moderation(commands.Cog):
     @commands.has_permissions(kick_members = True)
     @commands.guild_only()
     async def kick(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
-        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
         if ctx.interaction:
             await ctx.defer()
 
@@ -130,7 +129,6 @@ class moderation(commands.Cog):
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
     async def ban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
-        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
         if ctx.interaction:
             await ctx.defer()
 
@@ -197,7 +195,7 @@ class moderation(commands.Cog):
     @commands.hybrid_command(name = "unban", description='unbans a member', aliases = ["Unban","uban","Uban"])
     @commands.has_permissions(ban_members = True)
     @commands.guild_only()
-    async def unban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):        # Defer interaction to extend timeout window (default 3 seconds → 15 minutes)
+    async def unban(self, ctx: commands.Context, user: discord.Member|discord.User, reason: typing.Optional[str] = None):
         if ctx.interaction:
             await ctx.defer()
         try:
@@ -383,7 +381,6 @@ class moderation(commands.Cog):
                 logging.error("----!!ERROR!!----")
                 raise error
         except discord.NotFound:
-            # Interaction has expired; log the error but don't try to send a response
             logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
 
