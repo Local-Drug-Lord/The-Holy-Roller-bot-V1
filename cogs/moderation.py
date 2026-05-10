@@ -405,7 +405,6 @@ class moderation(commands.Cog):
                 logging.error("----!!ERROR!!----")
                 raise error
         except discord.NotFound:
-            # Interaction has expired; log the error but don't try to send a response
             logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
 
@@ -430,7 +429,6 @@ class moderation(commands.Cog):
                 logging.error("----!!ERROR!!----")
                 raise error
         except discord.NotFound:
-            # Interaction has expired; log the error but don't try to send a response
             logging.error("----!!ERROR!!---- (interaction expired, could not send error message)")
             raise error
         
