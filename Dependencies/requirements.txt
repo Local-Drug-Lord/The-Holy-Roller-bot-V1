@@ -9,4 +9,4 @@ idna==3.13
 multidict==6.7.1
 propcache==0.3.2
 typing_extensions==4.15.0
-yarl==1.22.0
+yarl==1.23.0
