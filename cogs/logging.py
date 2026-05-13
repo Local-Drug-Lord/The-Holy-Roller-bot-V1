@@ -389,12 +389,15 @@ class Logging(commands.Cog):
             embed.set_footer(text=f"Action made by: {message.author} ({message.author.id}).\nUTC: {current_time()}")
 
             # If the message had attachments, try to include them (prefer images)
+            # Initialize file_image before try block to prevent UnboundLocalError
+            file_image = None
             try:
                 attachments = getattr(message, 'attachments', []) or []
                 if attachments:
                     # find first image-like attachment
                     img_url = None
                     img_exts = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
+                    image_attachment = None
                     for a in attachments:
                         try:
                             ctype = getattr(a, 'content_type', None) or ''
@@ -403,14 +406,14 @@ class Logging(commands.Cog):
                         name = getattr(a, 'filename', '') or ''
                         if ctype.startswith('image') or name.lower().endswith(img_exts):
                             img_url = getattr(a, 'url', None)
+                            image_attachment = a
                             break
-                    file_image = None
-                    if img_url:
+                    if img_url and image_attachment:
                         # Prefer embedding the attachment as a file (works when attachment URLs are restricted)
                         try:
-                            data = await a.read()
-                            file_image = discord.File(io.BytesIO(data), filename=getattr(a, 'filename', 'attached_image'))
-                            embed.set_image(url=f"attachment://{getattr(a, 'filename', 'attached_image')}")
+                            data = await image_attachment.read()
+                            file_image = discord.File(io.BytesIO(data), filename=getattr(image_attachment, 'filename', 'attached_image'))
+                            embed.set_image(url=f"attachment://{getattr(image_attachment, 'filename', 'attached_image')}")
                         except Exception:
                             # fallback to remote URL if read() fails
                             try:
@@ -448,6 +451,7 @@ class Logging(commands.Cog):
             embed = create_standard_update_embed("Message Edited", desc, before.content or "None", after.content or "None", color=discord.Color.orange())
 
             # If either version had attachments, include them. Prefer showing the 'before' image if available.
+            file_image = None
             try:
                 b_atts = getattr(before, 'attachments', []) or []
                 a_atts = getattr(after, 'attachments', []) or []
@@ -1415,10 +1419,6 @@ class Logging(commands.Cog):
             dms_after = getattr(after, 'dms_paused_until', None)
         except Exception:
             dms_after = None
-        
-        # Log raw values for debugging
-        logging.info("on_guild_update (guild %s): inv_before=%s inv_after=%s dms_before=%s dms_after=%s", 
-                    after.id, inv_before, inv_after, dms_before, dms_after)
         
         # Format lockdown statuses
         inv_before_str = format_lockdown_status(inv_before)
