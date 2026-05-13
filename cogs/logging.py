@@ -1420,10 +1420,6 @@ class Logging(commands.Cog):
         except Exception:
             dms_after = None
         
-        # Log raw values for debugging
-        logging.info("on_guild_update (guild %s): inv_before=%s inv_after=%s dms_before=%s dms_after=%s", 
-                    after.id, inv_before, inv_after, dms_before, dms_after)
-        
         # Format lockdown statuses
         inv_before_str = format_lockdown_status(inv_before)
         inv_after_str = format_lockdown_status(inv_after)
