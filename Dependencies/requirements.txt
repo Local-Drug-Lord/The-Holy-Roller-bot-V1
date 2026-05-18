@@ -5,7 +5,7 @@ asyncpg==0.31.0
 attrs==26.1.0
 discord.py==2.6.4
 frozenlist==1.8.0
-idna==3.14
+idna==3.15
 multidict==6.7.1
 propcache==0.3.2
 typing_extensions==4.15.0
