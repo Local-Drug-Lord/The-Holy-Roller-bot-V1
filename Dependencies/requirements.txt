@@ -8,5 +8,5 @@ frozenlist==1.8.0
 idna==3.14
 multidict==6.7.1
 propcache==0.3.2
-typing_extensions==4.15.0
+typing_extensions==4.16.0
 yarl==1.23.0
